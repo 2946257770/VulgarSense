@@ -1,6 +1,6 @@
 # VulgarSense Base(LiquidBounce+ Reborn(Unofficial))
 
-The End Of Legacy(https://liquidbounceplus.github.io/)
+The End Of Legacy(https://github.com/Nel1yMinecraft/VulgarSense)
 
 The Reborn Of Legacy??(lbpr se)(liquidbounce plus reborn skidded edition)
 
@@ -34,7 +34,7 @@ Do the above and share your source code with everyone; just like we do.
 
 ## Setting up a Workspace
 LiquidBounce+ is using Gradle, so make sure that it is installed properly. Instructions can be found on [Gradle's website](https://gradle.org/install/).
-1. Clone the repository using `git clone https://github.com/liquidbounceplusreborn/LiquidbouncePlus-Reborn.git' 
+1. Clone the repository using `git clone https://github.com/Nel1yMinecraft/VulgarSense.git' 
 2. CD into the local repository folder.
 4. Depending on which IDE you are using execute either of the following commands:
     - For IntelliJ: `gradlew setupDevWorkspace idea genIntellijRuns build`
