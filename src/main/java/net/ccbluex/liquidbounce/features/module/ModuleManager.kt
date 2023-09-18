@@ -5,7 +5,8 @@
  */
 package net.ccbluex.liquidbounce.features.module
 
-import me.dev.AuraRangeHelper
+import me.nelly.AuraRangeHelper
+import me.nelly.Velocity2
 import me.rainyfall.AntiFakePlayer
 import me.rainyfall.GroundTelly
 import net.ccbluex.liquidbounce.LiquidBounce
@@ -227,7 +228,8 @@ class ModuleManager : Listenable {
             AntiBot::class.java,
             AntiFakePlayer::class.java,
             AuraRangeHelper::class.java,
-            GroundTelly::class.java
+            GroundTelly::class.java,
+            Velocity2::class.java
         )
         registerModule(Breaker)
         registerModule(ChestAura)

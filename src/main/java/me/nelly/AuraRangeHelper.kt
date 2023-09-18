@@ -1,4 +1,4 @@
-package me.dev
+package me.nelly
 
 import net.ccbluex.liquidbounce.features.module.modules.combat.KillAura
 import net.ccbluex.liquidbounce.LiquidBounce

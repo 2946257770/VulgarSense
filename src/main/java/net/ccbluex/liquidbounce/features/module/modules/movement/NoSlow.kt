@@ -251,6 +251,10 @@ class NoSlow : Module() {
                 }
             }
             "hyt" -> {
+                blockForwardMultiplier.set(0.8)
+                blockStrafeMultiplier.set(0.8)
+                consumeForwardMultiplier.set(0.8)
+                consumeStrafeMultiplier.set(0.8)
                 if((event.eventState == EventState.PRE && mc.thePlayer!!.itemInUse != null && mc.thePlayer!!.itemInUse!!.item != null) && !mc.thePlayer!!.isBlocking && mc.thePlayer.isUsingItem || itemType is ItemPotion) {
                     if (mc.thePlayer!!.isUsingItem && mc.thePlayer!!.itemInUseCount >= 1) {
                         if (mc.thePlayer.isSprinting) {
@@ -266,13 +270,6 @@ class NoSlow : Module() {
                 }
                 if (event.eventState == EventState.PRE && mc.thePlayer.isBlocking) {
                     mc.timer.timerSpeed = 1.0F
-                    mc.netHandler.addToSendQueue(
-                        C07PacketPlayerDigging(
-                            C07PacketPlayerDigging.Action.RELEASE_USE_ITEM,
-                            BlockPos(mc.thePlayer),
-                            EnumFacing.DOWN
-                        )
-                    )
                     mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, mc.thePlayer.inventory.getCurrentItem(), 0.0f, 0.0f, 0.0f))
                 }
             }

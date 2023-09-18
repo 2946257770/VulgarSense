@@ -41,7 +41,7 @@ class Velocity : Module() {
     private val verticalValue = FloatValue("Vertical", 0F, -1F, 1F, "x")
     private val horizontalExplosionValue = FloatValue("HorizontalExplosion", 0F, 0F, 1F, "x")
     private val verticalExplosionValue = FloatValue("VerticalExplosion", 0F, 0F, 1F, "x")
-    private val modeValue = ListValue("Mode", arrayOf("Cancel", "Simple","Hyt","Hypixel","AACv4", "AAC4Reduce", "AAC5Reduce", "AAC5.2.0", "AAC", "AACPush", "AACZero",
+    private val modeValue = ListValue("Mode", arrayOf("Cancel", "Simple","Hypixel","AACv4", "AAC4Reduce", "AAC5Reduce", "AAC5.2.0", "AAC", "AACPush", "AACZero",
             "Reverse", "SmoothReverse", "Jump", "Glitch", "Phase", "Matrix", "Legit",  "AEMine","GrimAC","AllAC","Intave","Smart"), "Cancel") // later
 
     private val aac5KillAuraValue = BoolValue("AAC5.2.0-Attack-Only", true) { modeValue.get().equals("aac5.2.0", true) }
@@ -387,12 +387,6 @@ class Velocity : Module() {
                     event.cancelEvent()
                     grimTCancel = cancelPacket
                 }
-                "hyt" -> {
-                    if (mc.theWorld.getBlockState(mc.thePlayer.position.down()).block !is BlockSlab) {
-                        shouldSendC07PacketPlayerDigging = true
-                        event.cancelEvent()
-                    }
-                }
             }
         }
 
@@ -473,23 +467,6 @@ class Velocity : Module() {
             }
             "aaczero" -> if (mc.thePlayer.hurtTime > 0)
                 event.cancelEvent()
-        }
-    }
-    @EventTarget
-    fun onMotion(event:MotionEvent) {
-        if (modeValue.isMode("Hyt")) {
-            if (event.eventState == EventState.PRE) {
-                if (mc.theWorld.getBlockState(mc.thePlayer.position.down()).block !is BlockSlab && shouldSendC07PacketPlayerDigging) {
-                    PacketUtils.sendPacketNoEvent(
-                        C07PacketPlayerDigging(
-                            C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK,
-                            BlockPos(mc.thePlayer),
-                            EnumFacing.DOWN
-                        )
-                    )
-                    shouldSendC07PacketPlayerDigging = false
-                }
-            }
         }
     }
 }
