@@ -1,0 +1,16 @@
+# Compiled class file
+*.class
+# Intellij
+*.ipr
+*.iml
+*.iws
+.idea/
+
+# Gradle
+build
+.gradle
+
+# LiquidBounce
+run
+gradle
+.idea
