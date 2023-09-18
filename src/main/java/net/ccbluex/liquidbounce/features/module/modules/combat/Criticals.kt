@@ -23,6 +23,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import java.util.*
 
 @ModuleInfo(name = "Criticals", description = "Automatically deals critical hits.", category = ModuleCategory.COMBAT)
 class Criticals : Module() {
@@ -54,15 +55,16 @@ class Criticals : Module() {
             val entity = event.targetEntity
 
             if (!mc.thePlayer.onGround || mc.thePlayer.isOnLadder || mc.thePlayer.isInWeb || mc.thePlayer.isInWater ||
-                    mc.thePlayer.isInLava || mc.thePlayer.ridingEntity != null || entity.hurtTime > hurtTimeValue.get() ||
-                    LiquidBounce.moduleManager[Fly::class.java]!!.state || !msTimer.hasTimePassed(delayValue.get().toLong()))
+                mc.thePlayer.isInLava || mc.thePlayer.ridingEntity != null || entity.hurtTime > hurtTimeValue.get() ||
+                LiquidBounce.moduleManager[Fly::class.java]!!.state || !msTimer.hasTimePassed(delayValue.get().toLong())
+            )
                 return
 
             val x = mc.thePlayer.posX
             val y = mc.thePlayer.posY
             val z = mc.thePlayer.posZ
 
-            when (modeValue.get().toLowerCase()) {
+            when (modeValue.get().lowercase(Locale.getDefault())) {
                 "newpacket" -> {
                     mc.netHandler.addToSendQueue(C04PacketPlayerPosition(x, y + 0.05250000001304, z, true))
                     mc.netHandler.addToSendQueue(C04PacketPlayerPosition(x, y + 0.00150000001304, z, false))
@@ -80,10 +82,38 @@ class Criticals : Module() {
                 }
 
                 "packet2" -> {
-                    mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.0625, mc.thePlayer.posZ, false))
-		            mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.09858, mc.thePlayer.posZ, false))
-		            mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.04114514, mc.thePlayer.posZ, false))
-		            mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.025, mc.thePlayer.posZ, false))
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY + 0.0625,
+                            mc.thePlayer.posZ,
+                            false
+                        )
+                    )
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY + 0.09858,
+                            mc.thePlayer.posZ,
+                            false
+                        )
+                    )
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY + 0.04114514,
+                            mc.thePlayer.posZ,
+                            false
+                        )
+                    )
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY + 0.025,
+                            mc.thePlayer.posZ,
+                            false
+                        )
+                    )
                 }
 
                 "ncppacket" -> {
@@ -96,8 +126,22 @@ class Criticals : Module() {
                 "aacv4" -> {
                     mc.thePlayer.motionZ *= 0
                     mc.thePlayer.motionX *= 0
-                    mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 3e-14, mc.thePlayer.posZ, true))
-                    mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 8e-15, mc.thePlayer.posZ, true))
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY + 3e-14,
+                            mc.thePlayer.posZ,
+                            true
+                        )
+                    )
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY + 8e-15,
+                            mc.thePlayer.posZ,
+                            true
+                        )
+                    )
                 }
 
                 "hop" -> {
@@ -167,26 +211,30 @@ class Criticals : Module() {
     @EventTarget
     fun onPacket(event: PacketEvent) {
         if (onlyAuraValue.get() && !LiquidBounce.moduleManager[KillAura::class.java]!!.state) return
-        
+
         val packet = event.packet
 
-        when (modeValue.get().toLowerCase()) {
+        when (modeValue.get().lowercase(Locale.getDefault())) {
             "redesky" -> {
                 if (packet is C03PacketPlayer) {
                     val packetPlayer: C03PacketPlayer = packet as C03PacketPlayer
-                    if(mc.thePlayer.onGround && canCrits) {
+                    if (mc.thePlayer.onGround && canCrits) {
                         packetPlayer.y += 0.000001
                         packetPlayer.onGround = false
                     }
-                    if(mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, mc.thePlayer.getEntityBoundingBox().offset(
-                                    0.0, (mc.thePlayer.motionY - 0.08) * 0.98, 0.0).expand(0.0, 0.0, 0.0)).isEmpty()) {
+                    if (mc.theWorld.getCollidingBoundingBoxes(
+                            mc.thePlayer, mc.thePlayer.getEntityBoundingBox().offset(
+                                0.0, (mc.thePlayer.motionY - 0.08) * 0.98, 0.0
+                            ).expand(0.0, 0.0, 0.0)
+                        ).isEmpty()
+                    ) {
                         packetPlayer.onGround = true;
                     }
                 }
-                if(packet is C07PacketPlayerDigging) {
-                    if(packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
+                if (packet is C07PacketPlayerDigging) {
+                    if (packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
                         canCrits = false;
-                    } else if(packet.status == C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK || packet.status == C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK) {
+                    } else if (packet.status == C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK || packet.status == C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK) {
                         canCrits = true;
                     }
                 }

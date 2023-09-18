@@ -53,7 +53,7 @@ class AutoPlay : Module() {
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
 
-        when (modeValue.get().toLowerCase()) {
+        when (modeValue.get().lowercase(Locale.getDefault())) {
             "redesky" -> {
                 if (clicking && (packet is C0EPacketClickWindow || packet is C07PacketPlayerDigging)) {
                     event.cancelEvent()
@@ -63,6 +63,7 @@ class AutoPlay : Module() {
                     event.cancelEvent()
                 }
             }
+
             "hypixel" -> {
                 if (clickState == 1 && packet is S2DPacketOpenWindow) {
                     event.cancelEvent()
@@ -77,9 +78,13 @@ class AutoPlay : Module() {
             val itemName = item.unlocalizedName
             val displayName = item.displayName
 
-            when (modeValue.get().toLowerCase()) {
+            when (modeValue.get().lowercase(Locale.getDefault())) {
                 "redesky" -> {
-                    if (clickState == 0 && windowId == 0 && slot == 42 && itemName.contains("paper", ignoreCase = true) && displayName.contains("Jogar novamente", ignoreCase = true)) {
+                    if (clickState == 0 && windowId == 0 && slot == 42 && itemName.contains(
+                            "paper",
+                            ignoreCase = true
+                        ) && displayName.contains("Jogar novamente", ignoreCase = true)
+                    ) {
                         clickState = 1
                         clicking = true
                         queueAutoPlay {
@@ -88,7 +93,11 @@ class AutoPlay : Module() {
                             mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
                             clickState = 2
                         }
-                    } else if (clickState == 2 && windowId != 0 && slot == 11 && itemName.contains("enderPearl", ignoreCase = true)) {
+                    } else if (clickState == 2 && windowId != 0 && slot == 11 && itemName.contains(
+                            "enderPearl",
+                            ignoreCase = true
+                        )
+                    ) {
                         Timer().schedule(500L) {
                             clicking = false
                             clickState = 0
@@ -96,8 +105,13 @@ class AutoPlay : Module() {
                         }
                     }
                 }
+
                 "blocksmc", "hypixel" -> {
-                    if (clickState == 0 && windowId == 0 && slot == 43 && itemName.contains("paper", ignoreCase = true)) {
+                    if (clickState == 0 && windowId == 0 && slot == 43 && itemName.contains(
+                            "paper",
+                            ignoreCase = true
+                        )
+                    ) {
                         queueAutoPlay {
                             mc.netHandler.addToSendQueue(C09PacketHeldItemChange(7))
                             repeat(2) {
@@ -106,7 +120,11 @@ class AutoPlay : Module() {
                         }
                         clickState = 1
                     }
-                    if (modeValue.equals("hypixel") && clickState == 1 && windowId != 0 && itemName.equals("item.fireworks", ignoreCase = true)) {
+                    if (modeValue.equals("hypixel") && clickState == 1 && windowId != 0 && itemName.equals(
+                            "item.fireworks",
+                            ignoreCase = true
+                        )
+                    ) {
                         mc.netHandler.addToSendQueue(C0EPacketClickWindow(windowId, slot, 0, 0, item, 1919))
                         mc.netHandler.addToSendQueue(C0DPacketCloseWindow(windowId))
                     }
@@ -114,7 +132,7 @@ class AutoPlay : Module() {
             }
         } else if (packet is S02PacketChat) {
             val text = packet.chatComponent.unformattedText
-            when (modeValue.get().toLowerCase()) {
+            when (modeValue.get().lowercase(Locale.getDefault())) {
                 "minemora" -> {
                     if (text.contains("Has click en alguna de las siguientes opciones", true)) {
                         queueAutoPlay {
@@ -122,9 +140,17 @@ class AutoPlay : Module() {
                         }
                     }
                 }
+
                 "blocksmc" -> {
                     if (clickState == 1 && text.contains("Only VIP players can join full servers!", true)) {
-                        LiquidBounce.hud.addNotification(Notification("AutoPlay","Join failed! trying again...", NotifyType.WARNING, 3000))
+                        LiquidBounce.hud.addNotification(
+                            Notification(
+                                "AutoPlay",
+                                "Join failed! trying again...",
+                                NotifyType.WARNING,
+                                3000
+                            )
+                        )
                         // connect failed so try to join again
                         Timer().schedule(1500L) {
                             mc.netHandler.addToSendQueue(C09PacketHeldItemChange(7))
@@ -134,12 +160,16 @@ class AutoPlay : Module() {
                         }
                     }
                 }
+
                 "jartex" -> {
                     val component = packet.chatComponent
                     if (text.contains("Click here to play again", true)) {
                         component.siblings.forEach { sib ->
                             val clickEvent = sib.chatStyle.chatClickEvent
-                            if(clickEvent != null && clickEvent.action == ClickEvent.Action.RUN_COMMAND && clickEvent.value.startsWith("/")) {
+                            if (clickEvent != null && clickEvent.action == ClickEvent.Action.RUN_COMMAND && clickEvent.value.startsWith(
+                                    "/"
+                                )
+                            ) {
                                 //println("clickEvent: ${clickEvent.value}")
                                 queueAutoPlay {
                                     mc.thePlayer.sendChatMessage(clickEvent.value)
@@ -148,6 +178,7 @@ class AutoPlay : Module() {
                         }
                     }
                 }
+
                 "hypixel" -> {
                     fun process(component: IChatComponent) {
                         val value = component.chatStyle.chatClickEvent?.value
@@ -162,21 +193,38 @@ class AutoPlay : Module() {
                     }
                     process(packet.chatComponent)
                 }
+
                 "minefc/heromc_bedwars" -> {
-                    if (text.contains("Bạn đã bị loại!", false) 
-                        || text.contains("đã thắng trò chơi", false)) {
+                    if (text.contains("Bạn đã bị loại!", false)
+                        || text.contains("đã thắng trò chơi", false)
+                    ) {
                         mc.thePlayer.sendChatMessage("/bw leave")
                         waitForLobby = true
                     }
                     if (((waitForLobby || autoStartValue.get()) && text.contains("¡Hiển thị", false))
-                        || (replayWhenKickedValue.get() && text.contains("[Anticheat] You have been kicked from the server!", false))) {
+                        || (replayWhenKickedValue.get() && text.contains(
+                            "[Anticheat] You have been kicked from the server!",
+                            false
+                        ))
+                    ) {
                         queueAutoPlay {
                             mc.thePlayer.sendChatMessage("/bw join ${bwModeValue.get()}")
                         }
                         waitForLobby = false
                     }
-                    if (showGuiWhenFailedValue.get() && text.contains("giây", false) && text.contains("thất bại", false)) {
-                        LiquidBounce.hud.addNotification(Notification("AutoPlay","Failed to join, showing GUI...", NotifyType.ERROR, 1000))
+                    if (showGuiWhenFailedValue.get() && text.contains("giây", false) && text.contains(
+                            "thất bại",
+                            false
+                        )
+                    ) {
+                        LiquidBounce.hud.addNotification(
+                            Notification(
+                                "AutoPlay",
+                                "Failed to join, showing GUI...",
+                                NotifyType.ERROR,
+                                1000
+                            )
+                        )
                         mc.thePlayer.sendChatMessage("/bw gui ${bwModeValue.get()}")
                     }
                 }

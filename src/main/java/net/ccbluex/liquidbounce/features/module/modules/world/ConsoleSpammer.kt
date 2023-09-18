@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.network.PacketBuffer
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.client.C17PacketCustomPayload
+import java.util.*
 import kotlin.random.Random
 
 @ModuleInfo(name = "ConsoleSpammer", spacedName = "Console Spammer", description = "Spams the console of the server with errors.", category = ModuleCategory.WORLD)
@@ -42,8 +43,15 @@ class ConsoleSpammer : Module() {
         if (!timer.hasTimePassed(delayValue.get().toLong()))
             return
 
-        when (modeValue.get().toLowerCase()) {
-            "payload" -> mc.netHandler.addToSendQueue(C17PacketCustomPayload(vulnerableChannels[Random.nextInt(vulnerableChannels.size)], payload))
+        when (modeValue.get().lowercase(Locale.getDefault())) {
+            "payload" -> mc.netHandler.addToSendQueue(
+                C17PacketCustomPayload(
+                    vulnerableChannels[Random.nextInt(
+                        vulnerableChannels.size
+                    )], payload
+                )
+            )
+
             "minesecure" -> {
                 mc.gameSettings.setModelPartEnabled(EnumPlayerModelParts.HAT, Random.nextBoolean())
                 mc.gameSettings.setModelPartEnabled(EnumPlayerModelParts.JACKET, Random.nextBoolean())
@@ -53,8 +61,18 @@ class ConsoleSpammer : Module() {
                 mc.gameSettings.setModelPartEnabled(EnumPlayerModelParts.RIGHT_SLEEVE, Random.nextBoolean())
 
                 repeat(5) {
-                    mc.netHandler.addToSendQueue(C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SNEAKING))
-                    mc.netHandler.addToSendQueue(C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SNEAKING))
+                    mc.netHandler.addToSendQueue(
+                        C0BPacketEntityAction(
+                            mc.thePlayer,
+                            C0BPacketEntityAction.Action.STOP_SNEAKING
+                        )
+                    )
+                    mc.netHandler.addToSendQueue(
+                        C0BPacketEntityAction(
+                            mc.thePlayer,
+                            C0BPacketEntityAction.Action.START_SNEAKING
+                        )
+                    )
                 }
             }
         }

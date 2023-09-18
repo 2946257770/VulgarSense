@@ -451,7 +451,7 @@ class KillAura : Module() {
         update()
 
         if (currentTarget != null && RotationUtils.targetRotation != null) {
-            when (rotationStrafeValue.get().toLowerCase()) {
+            when (rotationStrafeValue.get().lowercase(Locale.getDefault())) {
                 "strict" -> {
                     val (yaw) = RotationUtils.targetRotation ?: return
                     var strafe = event.strafe
@@ -850,7 +850,7 @@ class KillAura : Module() {
         }
 
         // Sort targets by priority
-        when (priorityValue.get().toLowerCase()) {
+        when (priorityValue.get().lowercase(Locale.getDefault())) {
             "distance" -> targets.sortBy { mc.thePlayer.getDistanceToEntityBox(it) } // Sort by distance
             "health" -> targets.sortBy { it.health } // Sort by health
             "direction" -> targets.sortBy { RotationUtils.getRotationDifference(it) } // Sort by FOV

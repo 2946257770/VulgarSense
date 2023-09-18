@@ -29,6 +29,7 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import org.checkerframework.common.value.qual.BoolVal
+import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 
@@ -386,7 +387,7 @@ class InvManager : Module() {
     private fun findBetterItem(targetSlot: Int, slotStack: ItemStack?): Int? {
         val type = type(targetSlot)
 
-        when (type.toLowerCase()) {
+        when (type.lowercase(Locale.getDefault())) {
             "sword", "pickaxe", "shovel", "axe" -> {
                 val currentType: Class<out Item> = when {
                     type.equals("Sword", ignoreCase = true) -> ItemSword::class.java
@@ -403,14 +404,20 @@ class InvManager : Module() {
                 }
 
                 mc.thePlayer.inventory.mainInventory.forEachIndexed { index, itemStack ->
-                    if (itemStack != null && itemStack.item.javaClass == currentType && !type(index).equals(type, ignoreCase = true)) {
+                    if (itemStack != null && itemStack.item.javaClass == currentType && !type(index).equals(
+                            type,
+                            ignoreCase = true
+                        )
+                    ) {
                         if (bestWeapon == -1) {
                             bestWeapon = index
                         } else {
-                            val currDamage = (itemStack.attributeModifiers["generic.attackDamage"].firstOrNull()?.amount ?: 0.0) + ItemHelper.getWeaponEnchantFactor(itemStack, nbtWeaponPriority.get(), goal)
+                            val currDamage = (itemStack.attributeModifiers["generic.attackDamage"].firstOrNull()?.amount
+                                ?: 0.0) + ItemHelper.getWeaponEnchantFactor(itemStack, nbtWeaponPriority.get(), goal)
 
                             val bestStack = mc.thePlayer.inventory.getStackInSlot(bestWeapon) ?: return@forEachIndexed
-                            val bestDamage = (bestStack.attributeModifiers["generic.attackDamage"].firstOrNull()?.amount ?: 0.0) + ItemHelper.getWeaponEnchantFactor(bestStack, nbtWeaponPriority.get(), goal)
+                            val bestDamage = (bestStack.attributeModifiers["generic.attackDamage"].firstOrNull()?.amount
+                                ?: 0.0) + ItemHelper.getWeaponEnchantFactor(bestStack, nbtWeaponPriority.get(), goal)
 
                             if (bestDamage < currDamage) {
                                 bestWeapon = index
@@ -465,7 +472,8 @@ class InvManager : Module() {
                     val item = stack?.item
 
                     if (item is ItemBlock && !InventoryHelper.isBlockListBlock(item) &&
-                        !type(index).equals("Block", ignoreCase = true)) {
+                        !type(index).equals("Block", ignoreCase = true)
+                    ) {
                         val replaceCurr = slotStack == null || slotStack.item !is ItemBlock
 
                         return if (replaceCurr) index else null
@@ -477,8 +485,13 @@ class InvManager : Module() {
                 mc.thePlayer.inventory.mainInventory.forEachIndexed { index, stack ->
                     val item = stack?.item
 
-                    if (item is ItemBucket && item.isFull == Blocks.flowing_water && !type(index).equals("Water", ignoreCase = true)) {
-                        val replaceCurr = slotStack == null || slotStack.item !is ItemBucket || (slotStack.item as ItemBucket).isFull != Blocks.flowing_water
+                    if (item is ItemBucket && item.isFull == Blocks.flowing_water && !type(index).equals(
+                            "Water",
+                            ignoreCase = true
+                        )
+                    ) {
+                        val replaceCurr =
+                            slotStack == null || slotStack.item !is ItemBucket || (slotStack.item as ItemBucket).isFull != Blocks.flowing_water
 
                         return if (replaceCurr) index else null
                     }
@@ -514,8 +527,10 @@ class InvManager : Module() {
                     val item = stack?.item
 
                     if ((item is ItemPotion && ItemPotion.isSplash(stack.itemDamage)) &&
-                        !type(index).equals("Potion", ignoreCase = true)) {
-                        val replaceCurr = slotStack == null || slotStack.item !is ItemPotion || !ItemPotion.isSplash(slotStack.itemDamage)
+                        !type(index).equals("Potion", ignoreCase = true)
+                    ) {
+                        val replaceCurr =
+                            slotStack == null || slotStack.item !is ItemPotion || !ItemPotion.isSplash(slotStack.itemDamage)
 
                         return if (replaceCurr) index else null
                     }

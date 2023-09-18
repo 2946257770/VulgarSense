@@ -29,6 +29,7 @@ import net.minecraft.scoreboard.Scoreboard
 import net.minecraft.util.EnumChatFormatting
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import java.util.*
 
 /**
  * CustomHUD scoreboard
@@ -290,9 +291,15 @@ class ScoreboardElement(x: Double = 5.0, y: Double = 0.0, scale: Float = 1F,
 
             // rect
             if (rectValue.get()) {
-                val rectColor = when (rectColorMode.toLowerCase()) {
+                val rectColor = when (rectColorMode.lowercase(Locale.getDefault())) {
                     "sky" -> RenderUtils.SkyRainbow(0, saturationValue.get(), brightnessValue.get())
-                    "rainbow" -> RenderUtils.getRainbowOpaque(cRainbowSecValue.get(), saturationValue.get(), brightnessValue.get(), 0)
+                    "rainbow" -> RenderUtils.getRainbowOpaque(
+                        cRainbowSecValue.get(),
+                        saturationValue.get(),
+                        brightnessValue.get(),
+                        0
+                    )
+
                     "liquidslowly" -> liquidSlowli
                     "fade" -> FadeColor
                     "mixer" -> mixerColor
@@ -355,27 +362,117 @@ class ScoreboardElement(x: Double = 5.0, y: Double = 0.0, scale: Float = 1F,
                             else -> rectCustomColor
                         }
                     if (side.horizontal == Side.Horizontal.LEFT) {
-                        when (domainShadowValue.get().toLowerCase()) {
-                            "none" -> domainFontValue.get().drawString(name.get(z).toString(), -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(), height.toFloat() + domainFontYValue.get(), typeColor, false)
-                            "default" -> domainFontValue.get().drawStringWithShadow(name.get(z).toString(), -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(), height.toFloat() + domainFontYValue.get(), typeColor)
+                        when (domainShadowValue.get().lowercase(Locale.getDefault())) {
+                            "none" -> domainFontValue.get().drawString(
+                                name.get(z).toString(),
+                                -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(),
+                                height.toFloat() + domainFontYValue.get(),
+                                typeColor,
+                                false
+                            )
+
+                            "default" -> domainFontValue.get().drawStringWithShadow(
+                                name.get(z).toString(),
+                                -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(),
+                                height.toFloat() + domainFontYValue.get(),
+                                typeColor
+                            )
+
                             "outline" -> {
-                                domainFontValue.get().drawString(name.get(z).toString(), -3F + domainFontValue.get().getStringWidth(stringZ).toFloat() - outlineWidthValue.get(), height.toFloat() + domainFontYValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), -3F + domainFontValue.get().getStringWidth(stringZ).toFloat() + outlineWidthValue.get(), height.toFloat() + domainFontYValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(), height.toFloat() + domainFontYValue.get() - outlineWidthValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(), height.toFloat() + domainFontYValue.get() + outlineWidthValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(), height.toFloat() + domainFontYValue.get(), typeColor, shadowValue.get())
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    -3F + domainFontValue.get().getStringWidth(stringZ)
+                                        .toFloat() - outlineWidthValue.get(),
+                                    height.toFloat() + domainFontYValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    -3F + domainFontValue.get().getStringWidth(stringZ)
+                                        .toFloat() + outlineWidthValue.get(),
+                                    height.toFloat() + domainFontYValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(),
+                                    height.toFloat() + domainFontYValue.get() - outlineWidthValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(),
+                                    height.toFloat() + domainFontYValue.get() + outlineWidthValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    -3F + domainFontValue.get().getStringWidth(stringZ).toFloat(),
+                                    height.toFloat() + domainFontYValue.get(),
+                                    typeColor,
+                                    shadowValue.get()
+                                )
                             }
                         }
                     } else {
-                        when (domainShadowValue.get().toLowerCase()) {
-                            "none" -> domainFontValue.get().drawString(name.get(z).toString(), l1.toFloat() + domainFontValue.get().getStringWidth(stringZ), height.toFloat() + domainFontYValue.get(), typeColor, false)
-                            "default" -> domainFontValue.get().drawStringWithShadow(name.get(z).toString(), l1.toFloat() + domainFontValue.get().getStringWidth(stringZ), height.toFloat() + domainFontYValue.get(), typeColor)
+                        when (domainShadowValue.get().lowercase(Locale.getDefault())) {
+                            "none" -> domainFontValue.get().drawString(
+                                name.get(z).toString(),
+                                l1.toFloat() + domainFontValue.get().getStringWidth(stringZ),
+                                height.toFloat() + domainFontYValue.get(),
+                                typeColor,
+                                false
+                            )
+
+                            "default" -> domainFontValue.get().drawStringWithShadow(
+                                name.get(z).toString(),
+                                l1.toFloat() + domainFontValue.get().getStringWidth(stringZ),
+                                height.toFloat() + domainFontYValue.get(),
+                                typeColor
+                            )
+
                             "outline" -> {
-                                domainFontValue.get().drawString(name.get(z).toString(), l1.toFloat() + domainFontValue.get().getStringWidth(stringZ) - outlineWidthValue.get(), height.toFloat() + domainFontYValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), l1.toFloat() + domainFontValue.get().getStringWidth(stringZ) + outlineWidthValue.get(), height.toFloat() + domainFontYValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), l1.toFloat() + domainFontValue.get().getStringWidth(stringZ), height.toFloat() + domainFontYValue.get() - outlineWidthValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), l1.toFloat() + domainFontValue.get().getStringWidth(stringZ), height.toFloat() + domainFontYValue.get() + outlineWidthValue.get(), Color.black.rgb, shadowValue.get())
-                                domainFontValue.get().drawString(name.get(z).toString(), l1.toFloat() + domainFontValue.get().getStringWidth(stringZ), height.toFloat() + domainFontYValue.get(), typeColor, shadowValue.get())
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    l1.toFloat() + domainFontValue.get()
+                                        .getStringWidth(stringZ) - outlineWidthValue.get(),
+                                    height.toFloat() + domainFontYValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    l1.toFloat() + domainFontValue.get()
+                                        .getStringWidth(stringZ) + outlineWidthValue.get(),
+                                    height.toFloat() + domainFontYValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    l1.toFloat() + domainFontValue.get().getStringWidth(stringZ),
+                                    height.toFloat() + domainFontYValue.get() - outlineWidthValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    l1.toFloat() + domainFontValue.get().getStringWidth(stringZ),
+                                    height.toFloat() + domainFontYValue.get() + outlineWidthValue.get(),
+                                    Color.black.rgb,
+                                    shadowValue.get()
+                                )
+                                domainFontValue.get().drawString(
+                                    name.get(z).toString(),
+                                    l1.toFloat() + domainFontValue.get().getStringWidth(stringZ),
+                                    height.toFloat() + domainFontYValue.get(),
+                                    typeColor,
+                                    shadowValue.get()
+                                )
                             }
                         }
                     }

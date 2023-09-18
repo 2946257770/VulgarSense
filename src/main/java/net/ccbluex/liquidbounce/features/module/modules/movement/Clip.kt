@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.value.FloatValue
 import net.ccbluex.liquidbounce.value.ListValue
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -28,28 +29,56 @@ class Clip : Module() {
         val x = -sin(yaw) * horizontalValue.get()
         val z = cos(yaw) * horizontalValue.get()
 
-        when (modeValue.get().toLowerCase()) {
-            "teleport" -> mc.thePlayer.setPosition(mc.thePlayer.posX + x, mc.thePlayer.posY + verticalValue.get(),
-                    mc.thePlayer.posZ + z)
+        when (modeValue.get().lowercase(Locale.getDefault())) {
+            "teleport" -> mc.thePlayer.setPosition(
+                mc.thePlayer.posX + x, mc.thePlayer.posY + verticalValue.get(),
+                mc.thePlayer.posZ + z
+            )
 
             "flag" -> {
                 val netHandler = mc.netHandler
 
-                netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX,
-                        mc.thePlayer.posY, mc.thePlayer.posZ, true))
-                netHandler.addToSendQueue(C04PacketPlayerPosition(0.5, 0.0,
-                        0.5, true))
-                netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX,
-                        mc.thePlayer.posY, mc.thePlayer.posZ, true))
-                netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX + x,
-                        mc.thePlayer.posY + verticalValue.get(), mc.thePlayer.posZ + z, true))
-                netHandler.addToSendQueue(C04PacketPlayerPosition(0.5,
-                        0.0, 0.5, true))
-                netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX
-                        + 0.5, mc.thePlayer.posY, mc.thePlayer.posZ + 0.5, true))
+                netHandler.addToSendQueue(
+                    C04PacketPlayerPosition(
+                        mc.thePlayer.posX,
+                        mc.thePlayer.posY, mc.thePlayer.posZ, true
+                    )
+                )
+                netHandler.addToSendQueue(
+                    C04PacketPlayerPosition(
+                        0.5, 0.0,
+                        0.5, true
+                    )
+                )
+                netHandler.addToSendQueue(
+                    C04PacketPlayerPosition(
+                        mc.thePlayer.posX,
+                        mc.thePlayer.posY, mc.thePlayer.posZ, true
+                    )
+                )
+                netHandler.addToSendQueue(
+                    C04PacketPlayerPosition(
+                        mc.thePlayer.posX + x,
+                        mc.thePlayer.posY + verticalValue.get(), mc.thePlayer.posZ + z, true
+                    )
+                )
+                netHandler.addToSendQueue(
+                    C04PacketPlayerPosition(
+                        0.5,
+                        0.0, 0.5, true
+                    )
+                )
+                netHandler.addToSendQueue(
+                    C04PacketPlayerPosition(
+                        mc.thePlayer.posX
+                                + 0.5, mc.thePlayer.posY, mc.thePlayer.posZ + 0.5, true
+                    )
+                )
 
-                mc.thePlayer.setPosition(mc.thePlayer.posX + -sin(yaw) * 0.04, mc.thePlayer.posY,
-                        mc.thePlayer.posZ + cos(yaw) * 0.04)
+                mc.thePlayer.setPosition(
+                    mc.thePlayer.posX + -sin(yaw) * 0.04, mc.thePlayer.posY,
+                    mc.thePlayer.posZ + cos(yaw) * 0.04
+                )
             }
         }
     }

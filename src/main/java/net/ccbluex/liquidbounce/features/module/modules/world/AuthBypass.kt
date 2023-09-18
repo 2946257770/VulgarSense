@@ -66,7 +66,7 @@ class AuthBypass : Module() {
 
             brLangMap.clear()
             for ((key,element) in localeJson.entrySet()) {
-                brLangMap["item.$key"] = element.asString.toLowerCase()
+                brLangMap["item.$key"] = element.asString.lowercase(Locale.getDefault())
             }
         }.start()
     }
@@ -83,15 +83,17 @@ class AuthBypass : Module() {
             }
             val itemName = item.unlocalizedName
 
-            when (type.toLowerCase()) {
+            when (type.lowercase(Locale.getDefault())) {
                 "skull" -> {
                     if (itemName.contains("item.skull.char", ignoreCase = true)) {
                         val nbt = item.tagCompound ?: return
                         // val uuid=nbt.get<CompoundTag>("SkullOwner").get<CompoundTag>("Properties").get<ListTag>("textures").get<CompoundTag>(0).get<StringTag>("Value").value
-                        val data = process(nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
-                            .getTagList("textures", NBTTagCompound.NBT_TYPES.indexOf("COMPOUND"))
-                            .getCompoundTagAt(0).getString("Value"))
-                        if (skull== null) {
+                        val data = process(
+                            nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
+                                .getTagList("textures", NBTTagCompound.NBT_TYPES.indexOf("COMPOUND"))
+                                .getCompoundTagAt(0).getString("Value")
+                        )
+                        if (skull == null) {
                             skull = data
                         } else if (skull != data) {
                             skull = null
@@ -141,7 +143,7 @@ class AuthBypass : Module() {
                     windowName.contains("bloco", ignoreCase = true) -> "skull"
                     else -> {
                         val splited = windowName.split(" ")
-                        var str = splited[splited.size - 1].replace(".", "").toLowerCase()
+                        var str = splited[splited.size - 1].replace(".", "").lowercase(Locale.getDefault())
                         if (str.endsWith("s")) {
                             str = str.substring(0, str.length - 1)
                         }

@@ -17,6 +17,7 @@ import net.ccbluex.liquidbounce.value.BoolValue
 import net.ccbluex.liquidbounce.value.FloatValue
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S03PacketTimeUpdate
+import java.util.*
 
 @ModuleInfo(name = "Ambience", description = "Change your world time and weather client-side.", category = ModuleCategory.WORLD)
 class Ambience : Module() {
@@ -56,10 +57,20 @@ class Ambience : Module() {
     }
 
     override val tag: String?
-        get() = when (tagValue.get().toLowerCase()) {
-            "timeonly" -> if (timeModeValue.get().equals("static", true)) staticTimeValue.get().toString() else timeCycle.toString()
-            "simplified" -> "${if (timeModeValue.get().equals("static", true)) staticTimeValue.get().toString() else timeCycle.toString()}, ${weatherModeValue.get()}"
-            "detailed" -> "Time: ${if (timeModeValue.get().equals("static", true)) staticTimeValue.get().toString() else "Cycle, ${timeCycle.toString()}"}, Weather: ${weatherModeValue.get()}"
+        get() = when (tagValue.get().lowercase(Locale.getDefault())) {
+            "timeonly" -> if (timeModeValue.get().equals("static", true)) staticTimeValue.get()
+                .toString() else timeCycle.toString()
+
+            "simplified" -> "${
+                if (timeModeValue.get().equals("static", true)) staticTimeValue.get()
+                    .toString() else timeCycle.toString()
+            }, ${weatherModeValue.get()}"
+
+            "detailed" -> "Time: ${
+                if (timeModeValue.get().equals("static", true)) staticTimeValue.get()
+                    .toString() else "Cycle, ${timeCycle.toString()}"
+            }, Weather: ${weatherModeValue.get()}"
+
             else -> null
         }
 }

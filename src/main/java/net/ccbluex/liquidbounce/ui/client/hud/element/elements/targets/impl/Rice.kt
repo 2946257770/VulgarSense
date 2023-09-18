@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import java.util.*
 
 class Rice(inst: Target): TargetStyle("Rice", inst, true) {
 
@@ -63,8 +64,9 @@ class Rice(inst: Target): TargetStyle("Rice", inst, true) {
         val name = "Name: ${entity.name}"
         val info = "Distance: ${decimalFormat2.format(mc.thePlayer.getDistanceToEntityBox(entity))}"
         val healthName = decimalFormat2.format(easingHealth)
-                    
-        val length = (font.getStringWidth(name).coerceAtLeast(font.getStringWidth(info)).toFloat() + 40F).coerceAtLeast(125F)
+
+        val length =
+            (font.getStringWidth(name).coerceAtLeast(font.getStringWidth(info)).toFloat() + 40F).coerceAtLeast(125F)
         val maxHealthLength = font.getStringWidth(decimalFormat2.format(entity.maxHealth)).toFloat()
 
         // background
@@ -78,19 +80,30 @@ class Rice(inst: Target): TargetStyle("Rice", inst, true) {
                     var parSize = RandomUtils.nextFloat(minParticleSize.get(), maxParticleSize.get())
                     var parDistX = RandomUtils.nextFloat(-particleRange.get(), particleRange.get())
                     var parDistY = RandomUtils.nextFloat(-particleRange.get(), particleRange.get())
-                    var firstChar = RandomUtils.random(1, "${if (riceParticleCircle.get().equals("none", true)) "" else "c"}${if (riceParticleRect.get().equals("none", true)) "" else "r"}${if (riceParticleTriangle.get().equals("none", true)) "" else "t"}")
-                    var drawType = ShapeType.getTypeFromName(when (firstChar) {
-                        "c" -> "c_${riceParticleCircle.get().toLowerCase()}"
-                        "r" -> "r_${riceParticleRect.get().toLowerCase()}"
-                        else -> "t_${riceParticleTriangle.get().toLowerCase()}"
-                    }) ?: break
+                    var firstChar = RandomUtils.random(
+                        1,
+                        "${if (riceParticleCircle.get().equals("none", true)) "" else "c"}${
+                            if (riceParticleRect.get().equals("none", true)) "" else "r"
+                        }${if (riceParticleTriangle.get().equals("none", true)) "" else "t"}"
+                    )
+                    var drawType = ShapeType.getTypeFromName(
+                        when (firstChar) {
+                            "c" -> "c_${riceParticleCircle.get().lowercase(Locale.getDefault())}"
+                            "r" -> "r_${riceParticleRect.get().lowercase(Locale.getDefault())}"
+                            else -> "t_${riceParticleTriangle.get().lowercase(Locale.getDefault())}"
+                        }
+                    ) ?: break
 
-                    particleList.add(Particle(
-                        BlendUtils.blendColors(
-                            floatArrayOf(0F, 1F), 
-                            arrayOf<Color>(Color.white, targetInstance.barColor), 
-                            if (RandomUtils.nextBoolean()) RandomUtils.nextFloat(0.5F, 1.0F) else 0F), 
-                        parDistX, parDistY, parSize, drawType))
+                    particleList.add(
+                        Particle(
+                            BlendUtils.blendColors(
+                                floatArrayOf(0F, 1F),
+                                arrayOf<Color>(Color.white, targetInstance.barColor),
+                                if (RandomUtils.nextBoolean()) RandomUtils.nextFloat(0.5F, 1.0F) else 0F
+                            ),
+                            parDistX, parDistY, parSize, drawType
+                        )
+                    )
                 }
                 gotDamaged = false
             }
@@ -100,7 +113,14 @@ class Rice(inst: Target): TargetStyle("Rice", inst, true) {
 
             particleList.forEach { particle ->
                 if (particle.alpha > 0F)
-                    particle.render(20F, 20F, riceParticleFade.get(), riceParticleSpeed.get(), riceParticleFadingSpeed.get(), riceParticleSpin.get())
+                    particle.render(
+                        20F,
+                        20F,
+                        riceParticleFade.get(),
+                        riceParticleSpeed.get(),
+                        riceParticleFadingSpeed.get(),
+                        riceParticleSpin.get()
+                    )
                 else
                     deleteQueue.add(particle)
             }
@@ -110,14 +130,16 @@ class Rice(inst: Target): TargetStyle("Rice", inst, true) {
 
         // custom head 
         val scaleHT = (entity.hurtTime.toFloat() / entity.maxHurtTime.coerceAtLeast(1).toFloat()).coerceIn(0F, 1F)
-        if (mc.netHandler.getPlayerInfo(entity.uniqueID) != null) 
-            drawHead(mc.netHandler.getPlayerInfo(entity.uniqueID).locationSkin, 
-                    5F + 15F * (scaleHT * 0.2F), 
-                    5F + 15F * (scaleHT * 0.2F), 
-                    1F - scaleHT * 0.2F, 
-                    30, 30, 
-                    1F, 0.4F + (1F - scaleHT) * 0.6F, 0.4F + (1F - scaleHT) * 0.6F,
-                    1F - targetInstance.getFadeProgress())
+        if (mc.netHandler.getPlayerInfo(entity.uniqueID) != null)
+            drawHead(
+                mc.netHandler.getPlayerInfo(entity.uniqueID).locationSkin,
+                5F + 15F * (scaleHT * 0.2F),
+                5F + 15F * (scaleHT * 0.2F),
+                1F - scaleHT * 0.2F,
+                30, 30,
+                1F, 0.4F + (1F - scaleHT) * 0.6F, 0.4F + (1F - scaleHT) * 0.6F,
+                1F - targetInstance.getFadeProgress()
+            )
 
         // player's info
         GlStateManager.resetColor()
@@ -139,12 +161,28 @@ class Rice(inst: Target): TargetStyle("Rice", inst, true) {
 
         GL11.glDisable(GL11.GL_BLEND)
         Stencil.erase(true)
-        when (targetInstance.colorModeValue.get().toLowerCase()) {
-            "custom", "health" -> RenderUtils.drawRect(5F, 42F, length - maxHealthLength, 48F, targetInstance.barColor.rgb)
+        when (targetInstance.colorModeValue.get().lowercase(Locale.getDefault())) {
+            "custom", "health" -> RenderUtils.drawRect(
+                5F,
+                42F,
+                length - maxHealthLength,
+                48F,
+                targetInstance.barColor.rgb
+            )
+
             else -> for (i in 0..(gradientLoopValue.get() - 1)) {
-                val barStart = i.toDouble() / gradientLoopValue.get().toDouble() * (length - 5F - maxHealthLength).toDouble()
-                val barEnd = (i + 1).toDouble() / gradientLoopValue.get().toDouble() * (length - 5F - maxHealthLength).toDouble()
-                RenderUtils.drawGradientSideways(5.0 + barStart, 42.0, 5.0 + barEnd, 48.0, getColorAtIndex(i), getColorAtIndex(i + 1))
+                val barStart =
+                    i.toDouble() / gradientLoopValue.get().toDouble() * (length - 5F - maxHealthLength).toDouble()
+                val barEnd =
+                    (i + 1).toDouble() / gradientLoopValue.get().toDouble() * (length - 5F - maxHealthLength).toDouble()
+                RenderUtils.drawGradientSideways(
+                    5.0 + barStart,
+                    42.0,
+                    5.0 + barEnd,
+                    48.0,
+                    getColorAtIndex(i),
+                    getColorAtIndex(i + 1)
+                )
             }
         }
         Stencil.dispose()

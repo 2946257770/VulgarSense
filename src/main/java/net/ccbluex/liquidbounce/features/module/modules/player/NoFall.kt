@@ -161,12 +161,22 @@ class NoFall : Module() {
             jumped = true
 
         if (!state || LiquidBounce.moduleManager[FreeCam::class.java]!!.state
-            || mc.thePlayer.isSpectator || mc.thePlayer.capabilities.allowFlying || mc.thePlayer.capabilities.disableDamage)
+            || mc.thePlayer.isSpectator || mc.thePlayer.capabilities.allowFlying || mc.thePlayer.capabilities.disableDamage
+        )
             return
 
         if (!LiquidBounce.moduleManager[Fly::class.java]!!.state && voidCheckValue.get() && !MovementUtils.isBlockUnder()) return
 
-        if (BlockUtils.collideBlock(mc.thePlayer.entityBoundingBox) { it is BlockLiquid } || BlockUtils.collideBlock(AxisAlignedBB(mc.thePlayer.entityBoundingBox.maxX, mc.thePlayer.entityBoundingBox.maxY, mc.thePlayer.entityBoundingBox.maxZ, mc.thePlayer.entityBoundingBox.minX, mc.thePlayer.entityBoundingBox.minY - 0.01, mc.thePlayer.entityBoundingBox.minZ)) { it is BlockLiquid })
+        if (BlockUtils.collideBlock(mc.thePlayer.entityBoundingBox) { it is BlockLiquid } || BlockUtils.collideBlock(
+                AxisAlignedBB(
+                    mc.thePlayer.entityBoundingBox.maxX,
+                    mc.thePlayer.entityBoundingBox.maxY,
+                    mc.thePlayer.entityBoundingBox.maxZ,
+                    mc.thePlayer.entityBoundingBox.minX,
+                    mc.thePlayer.entityBoundingBox.minY - 0.01,
+                    mc.thePlayer.entityBoundingBox.minZ
+                )
+            ) { it is BlockLiquid })
             return
 
         if (matrixFlagWait > 0) {
@@ -174,12 +184,13 @@ class NoFall : Module() {
                 mc.timer.timerSpeed = 1F
         }
 
-        when (typeValue.get().toLowerCase()) {
-            "packet" -> when (packetMode.get().toLowerCase()) {
+        when (typeValue.get().lowercase(Locale.getDefault())) {
+            "packet" -> when (packetMode.get().lowercase(Locale.getDefault())) {
                 "default" -> {
                     if (mc.thePlayer.fallDistance > 2F)
                         mc.netHandler.addToSendQueue(C03PacketPlayer(true))
                 }
+
                 "smart" -> {
                     if (mc.thePlayer.fallDistance - mc.thePlayer.motionY > 3f) {
                         mc.netHandler.addToSendQueue(C03PacketPlayer(true))
@@ -187,21 +198,38 @@ class NoFall : Module() {
                     }
                 }
             }
+
             "cubecraft" -> {
                 if (mc.thePlayer.fallDistance > 2F) {
                     mc.thePlayer.onGround = true
                     mc.netHandler.addToSendQueue(C03PacketPlayer(true))
                 }
             }
+
             "spartan" -> {
                 spartanTimer.update()
 
                 if (mc.thePlayer.fallDistance > 1.5F && spartanTimer.hasTimePassed(10)) {
-                    mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 10, mc.thePlayer.posZ, true))
-                    mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY - 10, mc.thePlayer.posZ, true))
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY + 10,
+                            mc.thePlayer.posZ,
+                            true
+                        )
+                    )
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY - 10,
+                            mc.thePlayer.posZ,
+                            true
+                        )
+                    )
                     spartanTimer.reset()
                 }
             }
+
             "verus" -> {
                 if (mc.thePlayer.fallDistance - mc.thePlayer.motionY > 3F) {
                     mc.thePlayer.motionY = 0.0
@@ -211,11 +239,13 @@ class NoFall : Module() {
                     needSpoof = true
                 }
             }
-            "matrix" -> when (matrixMode.get().toLowerCase()) {
+
+            "matrix" -> when (matrixMode.get().lowercase(Locale.getDefault())) {
                 "old" -> {
                     if (mc.thePlayer.fallDistance > 3)
                         isDmgFalling = true
                 }
+
                 "6.6.3" -> {
                     if (mc.thePlayer.fallDistance - mc.thePlayer.motionY > 3F) {
                         mc.thePlayer.fallDistance = 0.0f
@@ -224,6 +254,7 @@ class NoFall : Module() {
                         modifiedTimer = true
                     }
                 }
+
                 "6.2.x" -> {
                     if (matrixFalling) {
                         mc.thePlayer.motionX = 0.0
@@ -253,7 +284,8 @@ class NoFall : Module() {
                     }
                 }
             }
-            "aac" -> when (aacMode.get().toLowerCase()) {
+
+            "aac" -> when (aacMode.get().lowercase(Locale.getDefault())) {
                 "default" -> {
                     if (mc.thePlayer.fallDistance > 2f) {
                         mc.netHandler.addToSendQueue(C03PacketPlayer(true))
@@ -268,21 +300,39 @@ class NoFall : Module() {
                         if (oldaacState == 5) oldaacState = 1
                     }
                 }
+
                 "laac" -> if (!jumped && mc.thePlayer.onGround && !mc.thePlayer.isOnLadder && !mc.thePlayer.isInWater && !mc.thePlayer.isInWeb) {
                     mc.thePlayer.motionY = -6.0
                 }
+
                 "3.3.11" -> if (mc.thePlayer.fallDistance > 2F) {
                     mc.thePlayer.motionX = 0.0
                     mc.thePlayer.motionZ = 0.0
-                    mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY - 10E-4, mc.thePlayer.posZ, mc.thePlayer.onGround))
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            mc.thePlayer.posX,
+                            mc.thePlayer.posY - 10E-4,
+                            mc.thePlayer.posZ,
+                            mc.thePlayer.onGround
+                        )
+                    )
                     mc.netHandler.addToSendQueue(C03PacketPlayer(true))
                 }
+
                 "3.3.15" -> if (mc.thePlayer.fallDistance > 2) {
                     if (!mc.isIntegratedServerRunning) {
-                        mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, Double.NaN, mc.thePlayer.posZ, false))
+                        mc.netHandler.addToSendQueue(
+                            C03PacketPlayer.C04PacketPlayerPosition(
+                                mc.thePlayer.posX,
+                                Double.NaN,
+                                mc.thePlayer.posZ,
+                                false
+                            )
+                        )
                     }
                     mc.thePlayer.fallDistance = -9999f
                 }
+
                 "5.0.4", "loyisa4.4.2" -> {
                     if (mc.thePlayer.fallDistance > 3)
                         isDmgFalling = true
@@ -299,6 +349,7 @@ class NoFall : Module() {
                         }
                     }
                 }
+
                 "5.0.14" -> {
                     var offsetYs = 0.0
                     aac5Check = false
@@ -306,7 +357,8 @@ class NoFall : Module() {
                     while (mc.thePlayer.motionY - 1.5 < offsetYs) {
                         val blockPos = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY + offsetYs, mc.thePlayer.posZ)
                         val block = BlockUtils.getBlock(blockPos)
-                        val axisAlignedBB = block!!.getCollisionBoundingBox(mc.theWorld, blockPos, BlockUtils.getState(blockPos))
+                        val axisAlignedBB =
+                            block!!.getCollisionBoundingBox(mc.theWorld, blockPos, BlockUtils.getState(blockPos))
                         if (axisAlignedBB != null) {
                             offsetYs = -999.9
                             aac5Check = true
@@ -329,12 +381,21 @@ class NoFall : Module() {
                         aac5doFlag = false
 
                     if (aac5doFlag)
-                        mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + if (mc.thePlayer.onGround) 0.5 else 0.42, mc.thePlayer.posZ, true))
+                        mc.netHandler.addToSendQueue(
+                            C03PacketPlayer.C04PacketPlayerPosition(
+                                mc.thePlayer.posX,
+                                mc.thePlayer.posY + if (mc.thePlayer.onGround) 0.5 else 0.42,
+                                mc.thePlayer.posZ,
+                                true
+                            )
+                        )
                 }
             }
+
             "motion" -> if (mc.thePlayer.fallDistance > 3F) {
                 mc.thePlayer.motionY = flySpeedValue.get().toDouble()
             }
+
             "phase" -> {
                 if (mc.thePlayer.fallDistance > 3 + phaseOffsetValue.get()) {
                     val fallPos = NewFallingPlayer(mc.thePlayer)
@@ -343,8 +404,19 @@ class NoFall : Module() {
                         mc.timer.timerSpeed = 0.05f
                         Timer().schedule(100L) {
                             try {
-                                mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(fallPos.x.toDouble(), fallPos.y.toDouble(), fallPos.z.toDouble(), true))
-                                mc.thePlayer.setPosition(fallPos.x.toDouble(), fallPos.y.toDouble(), fallPos.z.toDouble())
+                                mc.netHandler.addToSendQueue(
+                                    C03PacketPlayer.C04PacketPlayerPosition(
+                                        fallPos.x.toDouble(),
+                                        fallPos.y.toDouble(),
+                                        fallPos.z.toDouble(),
+                                        true
+                                    )
+                                )
+                                mc.thePlayer.setPosition(
+                                    fallPos.x.toDouble(),
+                                    fallPos.y.toDouble(),
+                                    fallPos.z.toDouble()
+                                )
                             } catch (e: Exception) {
                                 // ignore, may leave unexpectedly.
                             }
@@ -353,6 +425,7 @@ class NoFall : Module() {
                     }
                 }
             }
+
             "edit" -> if (editMode.get().equals("smart", true)) {
                 if (mc.thePlayer.fallDistance.toInt() / 3 > lastFallDistRounded) {
                     lastFallDistRounded = mc.thePlayer.fallDistance.toInt() / 3
@@ -361,6 +434,7 @@ class NoFall : Module() {
                 if (mc.thePlayer.onGround)
                     lastFallDistRounded = 0
             }
+
             "hypixel" -> if (hypixelMode.get().equals("packet", true)) {
                 val offset = 2.5
                 if (!mc.thePlayer.onGround && mc.thePlayer.fallDistance - matrixFallTicks * offset >= 0.0) {
@@ -369,6 +443,7 @@ class NoFall : Module() {
                 } else if (mc.thePlayer.onGround)
                     matrixFallTicks = 1
             }
+
             "vulcan" -> {
                 if (!vulcanNoFall && mc.thePlayer.fallDistance > 3.25)
                     vulcanNoFall = true
@@ -549,10 +624,11 @@ class NoFall : Module() {
             }
 
             if (typeValue.get().equals("hypixel", true)) {
-                when (hypixelMode.get().toLowerCase()) {
+                when (hypixelMode.get().lowercase(Locale.getDefault())) {
                     "default" -> if (mc.thePlayer.fallDistance > 1.5) {
                         packet.onGround = mc.thePlayer.ticksExisted % 2 == 0
                     }
+
                     "new" -> if (mc.thePlayer.fallDistance > 2.5F && mc.thePlayer.ticksExisted % 2 == 0) {
                         packet.onGround = true
                         packet.setMoving(false)
@@ -566,7 +642,7 @@ class NoFall : Module() {
             }
 
             if (typeValue.get().equals("aac", true)) {
-                when (aacMode.get().toLowerCase()) {
+                when (aacMode.get().lowercase(Locale.getDefault())) {
                     "4.x" -> if (aac4Fakelag) {
                         event.cancelEvent()
                         if (packetModify) {
@@ -575,17 +651,33 @@ class NoFall : Module() {
                         }
                         aac4Packets.add(packet)
                     }
+
                     "4.4.x" -> if (mc.thePlayer.fallDistance > 1.6) {
                         packet.onGround = true
                     }
+
                     "5.0.4" -> if (isDmgFalling) {
                         if (packet.onGround && mc.thePlayer.onGround) {
                             isDmgFalling = false
                             packet.onGround = true
                             mc.thePlayer.onGround = false
                             packet.y += 1.0
-                            mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(packet.x, packet.y - 1.0784, packet.z, false))
-                            mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(packet.x, packet.y - 0.5, packet.z, true))
+                            mc.netHandler.addToSendQueue(
+                                C03PacketPlayer.C04PacketPlayerPosition(
+                                    packet.x,
+                                    packet.y - 1.0784,
+                                    packet.z,
+                                    false
+                                )
+                            )
+                            mc.netHandler.addToSendQueue(
+                                C03PacketPlayer.C04PacketPlayerPosition(
+                                    packet.x,
+                                    packet.y - 0.5,
+                                    packet.z,
+                                    true
+                                )
+                            )
                         }
                     }
                 }

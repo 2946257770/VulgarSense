@@ -8,6 +8,7 @@ package net.ccbluex.liquidbounce.features.module.modules.render
 import net.ccbluex.liquidbounce.features.module.*
 import net.ccbluex.liquidbounce.value.*
 import net.ccbluex.liquidbounce.event.*
+import java.util.*
 
 @ModuleInfo(name = "SpinBot", spacedName = "Spin Bot", description = "Client-sided spin bot like CS:GO hacks.", category = ModuleCategory.RENDER)
 class SpinBot : Module() {
@@ -34,10 +35,10 @@ class SpinBot : Module() {
     @EventTarget
     fun onRender3D(event: Render3DEvent) {
         mc.thePlayer ?: return
-        
+
         if (!yawMode.get().equals("none", true)) {
             var yaw = 0F
-            when (yawMode.get().toLowerCase()) {
+            when (yawMode.get().lowercase(Locale.getDefault())) {
                 "static" -> yaw = static_offsetYaw.get()
                 "offset" -> yaw = mc.thePlayer.rotationYaw + static_offsetYaw.get()
                 "random" -> yaw = Math.floor(Math.random() * 360.0 - 180.0).toFloat()
@@ -47,6 +48,7 @@ class SpinBot : Module() {
                     else
                         yaw = mc.thePlayer.rotationYaw - 180F
                 }
+
                 "spin" -> {
                     lastSpin += yawSpinSpeed.get()
                     yaw = lastSpin
@@ -56,7 +58,7 @@ class SpinBot : Module() {
             mc.thePlayer.rotationYawHead = yaw
             lastSpin = yaw
         }
-        when (pitchMode.get().toLowerCase()) {
+        when (pitchMode.get().lowercase(Locale.getDefault())) {
             "static" -> pitch = static_offsetPitch.get()
             "offset" -> pitch = mc.thePlayer.rotationPitch + static_offsetPitch.get()
             "random" -> pitch = Math.floor(Math.random() * 180.0 - 90.0).toFloat()

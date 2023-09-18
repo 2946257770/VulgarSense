@@ -25,15 +25,33 @@ class Kick : Module() {
             return
         }
 
-        when (modeValue.get().toLowerCase()) {
+        when (modeValue.get().lowercase(Locale.getDefault())) {
             "quit" -> mc.theWorld.sendQuittingDisconnectingPacket()
-            "invalidpacket" -> mc.netHandler.addToSendQueue(C04PacketPlayerPosition(Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, !mc.thePlayer.onGround))
-            "selfhurt" -> mc.netHandler.addToSendQueue(C02PacketUseEntity(mc.thePlayer, C02PacketUseEntity.Action.ATTACK))
+            "invalidpacket" -> mc.netHandler.addToSendQueue(
+                C04PacketPlayerPosition(
+                    Double.NaN,
+                    Double.NEGATIVE_INFINITY,
+                    Double.POSITIVE_INFINITY,
+                    !mc.thePlayer.onGround
+                )
+            )
+
+            "selfhurt" -> mc.netHandler.addToSendQueue(
+                C02PacketUseEntity(
+                    mc.thePlayer,
+                    C02PacketUseEntity.Action.ATTACK
+                )
+            )
+
             "illegalchat" -> mc.thePlayer.sendChatMessage(Random().nextInt().toString() + "§§§" + Random().nextInt())
             "packetspam" -> {
                 repeat(9999) {
-                    mc.netHandler.addToSendQueue(C04PacketPlayerPosition(it.toDouble(), it.toDouble(), it.toDouble(),
-                            Random().nextBoolean()))
+                    mc.netHandler.addToSendQueue(
+                        C04PacketPlayerPosition(
+                            it.toDouble(), it.toDouble(), it.toDouble(),
+                            Random().nextBoolean()
+                        )
+                    )
                 }
             }
         }

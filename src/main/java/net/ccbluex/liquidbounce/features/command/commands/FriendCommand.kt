@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.module.modules.world.AntiBot
 import net.ccbluex.liquidbounce.utils.misc.StringUtils
 import net.ccbluex.liquidbounce.utils.render.ColorUtils
+import java.util.*
 
 class FriendCommand : Command("friend", arrayOf("friends")) {
     /**
@@ -132,16 +133,17 @@ class FriendCommand : Command("friend", arrayOf("friends")) {
         return when (args.size) {
             1 -> listOf("add", "addall", "remove", "removeall", "list", "clear").filter { it.startsWith(args[0], true) }
             2 -> {
-                when (args[0].toLowerCase()) {
+                when (args[0].lowercase(Locale.getDefault())) {
                     "add" -> {
                         return mc.theWorld.playerEntities
                             .map { it.name }
                             .filter { it.startsWith(args[1], true) }
                     }
+
                     "remove" -> {
                         return LiquidBounce.fileManager.friendsConfig.friends
-                                .map { it.playerName }
-                                .filter { it.startsWith(args[1], true) }
+                            .map { it.playerName }
+                            .filter { it.startsWith(args[1], true) }
                     }
                 }
                 return emptyList()

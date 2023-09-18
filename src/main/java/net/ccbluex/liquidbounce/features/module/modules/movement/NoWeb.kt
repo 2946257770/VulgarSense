@@ -14,6 +14,7 @@ import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.utils.MovementUtils
 import net.ccbluex.liquidbounce.value.FloatValue
 import net.ccbluex.liquidbounce.value.ListValue
+import java.util.*
 
 @ModuleInfo(name = "NoWeb", spacedName = "No Web", description = "Prevents you from getting slowed down in webs.", category = ModuleCategory.MOVEMENT)
 class NoWeb : Module() {
@@ -22,6 +23,7 @@ class NoWeb : Module() {
     private val horizonSpeed = FloatValue("HorizonSpeed", 0.1F, 0.01F, 0.8F)
 
     private var usedTimer = false
+
     @EventTarget
     fun onUpdate(event: UpdateEvent) {
         if (usedTimer) {
@@ -31,7 +33,7 @@ class NoWeb : Module() {
         if (!mc.thePlayer.isInWeb)
             return
 
-        when (modeValue.get().toLowerCase()) {
+        when (modeValue.get().lowercase(Locale.getDefault())) {
             "none" -> mc.thePlayer.isInWeb = false
             "aac" -> {
                 mc.thePlayer.jumpMovementFactor = 0.59f
@@ -39,6 +41,7 @@ class NoWeb : Module() {
                 if (!mc.gameSettings.keyBindSneak.isKeyDown)
                     mc.thePlayer.motionY = 0.0
             }
+
             "laac" -> {
                 mc.thePlayer.jumpMovementFactor = if (mc.thePlayer.movementInput.moveStrafe != 0f) 1.0f else 1.21f
 
@@ -48,6 +51,7 @@ class NoWeb : Module() {
                 if (mc.thePlayer.onGround)
                     mc.thePlayer.jump()
             }
+
             "rewi" -> {
                 mc.thePlayer.jumpMovementFactor = 0.42f
 
@@ -60,41 +64,45 @@ class NoWeb : Module() {
                 mc.gameSettings.keyBindBack.pressed = false
                 mc.gameSettings.keyBindLeft.pressed = false
 
-                if(mc.thePlayer.onGround){
+                if (mc.thePlayer.onGround) {
                     MovementUtils.strafe(0.25F)
-                }else{
+                } else {
                     MovementUtils.strafe(0.12F)
                     mc.thePlayer.motionY = 0.0
                 }
             }
+
             "cardinal" -> {
-                if(mc.thePlayer.onGround){
+                if (mc.thePlayer.onGround) {
                     MovementUtils.strafe(0.262F)
-                }else{
+                } else {
                     MovementUtils.strafe(0.366F)
                 }
             }
+
             "horizon" -> {
-                if(mc.thePlayer.onGround){
+                if (mc.thePlayer.onGround) {
                     MovementUtils.strafe(horizonSpeed.get())
                 }
             }
+
             "spartan" -> {
                 MovementUtils.strafe(0.27F)
                 mc.timer.timerSpeed = 3.7F
                 if (!mc.gameSettings.keyBindSneak.isKeyDown)
                     mc.thePlayer.motionY = 0.0
-                if(mc.thePlayer.ticksExisted % 2 == 0){
+                if (mc.thePlayer.ticksExisted % 2 == 0) {
                     mc.timer.timerSpeed = 1.7F
                 }
-                if(mc.thePlayer.ticksExisted % 40 == 0){
+                if (mc.thePlayer.ticksExisted % 40 == 0) {
                     mc.timer.timerSpeed = 3F
                 }
                 usedTimer = true
             }
+
             "negativity" -> {
                 mc.thePlayer.jumpMovementFactor = 0.4f
-                if(mc.thePlayer.ticksExisted % 2 == 0){
+                if (mc.thePlayer.ticksExisted % 2 == 0) {
                     mc.thePlayer.jumpMovementFactor = 0.53F
                 }
                 if (!mc.gameSettings.keyBindSneak.isKeyDown)

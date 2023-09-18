@@ -28,6 +28,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import java.util.*
 
 @ModuleInfo(name = "TargetStrafe", description = "Strafe around your target. (Require Fly or Speed to be enabled)", category = ModuleCategory.MOVEMENT)
 class TargetStrafe : Module() {
@@ -62,8 +63,9 @@ class TargetStrafe : Module() {
 
     val cansize: Float
         get() = when {
-            radiusMode.get().toLowerCase() == "simple" ->
-                45f / mc.thePlayer!!.getDistance(killAura.target!!.posX, mc.thePlayer!!.posY, killAura.target!!.posZ).toFloat()
+            radiusMode.get().lowercase(Locale.getDefault()) == "simple" ->
+                45f / mc.thePlayer!!.getDistance(killAura.target!!.posX, mc.thePlayer!!.posY, killAura.target!!.posZ)
+                    .toFloat()
             else -> 45f
         }
     val Enemydistance: Double
@@ -155,11 +157,11 @@ class TargetStrafe : Module() {
 
         if (forward != 0.0) {
             if (strafe > 0.0) {
-                if (radiusMode.get().toLowerCase() == "trueradius")
+                if (radiusMode.get().lowercase(Locale.getDefault()) == "trueradius")
                     yaw += (if (forward > 0.0) -cansize else cansize)
                 strafe2 += (if (forward > 0.0) -45 / algorithm else 45 / algorithm)
             } else if (strafe < 0.0) {
-                if (radiusMode.get().toLowerCase() == "trueradius")
+                if (radiusMode.get().lowercase(Locale.getDefault()) == "trueradius")
                     yaw += (if (forward > 0.0) cansize else -cansize)
                 strafe2 += (if (forward > 0.0) 45 / algorithm else -45 / algorithm)
             }
@@ -184,7 +186,7 @@ class TargetStrafe : Module() {
 
 
     val keyMode: Boolean
-        get() = when (modeValue.get().toLowerCase()) {
+        get() = when (modeValue.get().lowercase(Locale.getDefault())) {
             "jump" -> mc.gameSettings.keyBindJump.isKeyDown
             "none" -> mc.thePlayer.movementInput.moveStrafe != 0f || mc.thePlayer.movementInput.moveForward != 0f
             else -> false

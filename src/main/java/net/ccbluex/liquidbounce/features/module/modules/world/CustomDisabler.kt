@@ -17,37 +17,37 @@ import net.ccbluex.liquidbounce.utils.misc.RandomUtils
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
 import net.ccbluex.liquidbounce.value.*
 import net.minecraft.network.play.client.*
-
-import java.util.LinkedList
-import java.util.UUID
+import java.util.*
 
 @ModuleInfo(name = "CustomDisabler", spacedName = "Custom Disabler", description = "Disabler but fully customizable. Contains 10+ options.", category = ModuleCategory.WORLD)
 class CustomDisabler : Module() {
 
 	// automatically set the disabler to proper values for bypassing purpose
 	private val presets: ListValue = object : ListValue("Presets", arrayOf("Ghostly", "OldKauri", "Basic"), "Ghostly") {
-		override fun onChanged(oldValue: String, newValue: String) {
-			when (newValue.toLowerCase()) {
-				"ghostly" -> {
-					cancelTrans.set(true)
-					cancelAlive.set(true)
-					ridingPacket.set("EmptyArgs")
-					spectatePacket.set("None")
-				}
-				"oldkauri" -> {
-					cancelTrans.set(true)
-					cancelAlive.set(false)
-					ridingPacket.set("None")
-					spectatePacket.set("None")
-				}
-				"basic" -> {
-					cancelTrans.set(true)
-					cancelAlive.set(true)
-					ridingPacket.set("None")
-					spectatePacket.set("None")
-				}
-			}
-		}
+        override fun onChanged(oldValue: String, newValue: String) {
+            when (newValue.lowercase(Locale.getDefault())) {
+                "ghostly" -> {
+                    cancelTrans.set(true)
+                    cancelAlive.set(true)
+                    ridingPacket.set("EmptyArgs")
+                    spectatePacket.set("None")
+                }
+
+                "oldkauri" -> {
+                    cancelTrans.set(true)
+                    cancelAlive.set(false)
+                    ridingPacket.set("None")
+                    spectatePacket.set("None")
+                }
+
+                "basic" -> {
+                    cancelTrans.set(true)
+                    cancelAlive.set(true)
+                    ridingPacket.set("None")
+                    spectatePacket.set("None")
+                }
+            }
+        }
 	}
 	private val cancelTrans = BoolValue("CancelTransactions", false)
 	private val cancelAlive = BoolValue("CancelKeepAlive", false)
@@ -249,62 +249,62 @@ class CustomDisabler : Module() {
 	fun onUpdate(event: UpdateEvent) {
 		if (mc.thePlayer == null || mc.theWorld == null) return
 		if (transEnabled.get() && !cancelTrans.get()) {
-			val sendWhen = when (transDelayMode.get().toLowerCase()) {
-				"playertick" -> mc.thePlayer.ticksExisted > 0 && mc.thePlayer.ticksExisted % trans_pTickDelay.get() == 0
-				"systemtick" -> msTimerTrans.hasTimePassed(transDelay.toLong())
-				"dynamic" -> msTimerTrans.hasTimePassed(dynTransDelay.toLong())
-				else -> trans.size >= transBusMinSize.get()
-			}
-			if (!trans.isEmpty() && sendWhen) {
-				if (transSendMethod.get().equals("flushall", true)) {
-					while (trans.size > 0)
-						PacketUtils.sendPacketNoEvent(trans.poll())
+            val sendWhen = when (transDelayMode.get().lowercase(Locale.getDefault())) {
+                "playertick" -> mc.thePlayer.ticksExisted > 0 && mc.thePlayer.ticksExisted % trans_pTickDelay.get() == 0
+                "systemtick" -> msTimerTrans.hasTimePassed(transDelay.toLong())
+                "dynamic" -> msTimerTrans.hasTimePassed(dynTransDelay.toLong())
+                else -> trans.size >= transBusMinSize.get()
+            }
+            if (!trans.isEmpty() && sendWhen) {
+                if (transSendMethod.get().equals("flushall", true)) {
+                    while (trans.size > 0)
+                        PacketUtils.sendPacketNoEvent(trans.poll())
 
-					debug("flushed.")
-				} else {
-					val hake = RandomUtils.nextInt(trans_poll_Min.get(), trans_poll_Max.get()).coerceAtMost(trans.size)
-					repeat (hake) {
-						if (transSendMethod.get().equals("pollfirst"))
-							PacketUtils.sendPacketNoEvent(trans.pollFirst())
-						else
-							PacketUtils.sendPacketNoEvent(trans.pollLast())
-					}
-					
-					debug("poll $hake times.")
-				}
-				if (clearTransSent.get()) trans.clear()
-				transDelay = RandomUtils.nextInt(trans_sTick_MinDelay.get(), trans_sTick_MaxDelay.get())
-				msTimerTrans.reset()
-			}
-		}
+                    debug("flushed.")
+                } else {
+                    val hake = RandomUtils.nextInt(trans_poll_Min.get(), trans_poll_Max.get()).coerceAtMost(trans.size)
+                    repeat(hake) {
+                        if (transSendMethod.get().equals("pollfirst"))
+                            PacketUtils.sendPacketNoEvent(trans.pollFirst())
+                        else
+                            PacketUtils.sendPacketNoEvent(trans.pollLast())
+                    }
+
+                    debug("poll $hake times.")
+                }
+                if (clearTransSent.get()) trans.clear()
+                transDelay = RandomUtils.nextInt(trans_sTick_MinDelay.get(), trans_sTick_MaxDelay.get())
+                msTimerTrans.reset()
+            }
+        }
 		if (aliveEnabled.get() && !cancelAlive.get()) {
-			val sendWhen = when (aliveDelayMode.get().toLowerCase()) {
-				"playertick" -> mc.thePlayer.ticksExisted > 0 && mc.thePlayer.ticksExisted % alive_pTickDelay.get() == 0
-				"systemtick" -> msTimerAlive.hasTimePassed(aliveDelay.toLong())
-				"dynamic" -> msTimerAlive.hasTimePassed(dynAliveDelay.toLong())
-				else -> alive.size >= aliveBusMinSize.get()
-			}
-			if (!alive.isEmpty() && sendWhen) {
-				if (aliveSendMethod.get().equals("flushall", true)) {
-					while (alive.size > 0)
-						PacketUtils.sendPacketNoEvent(alive.poll())
-					
-					debug("flushed.")
-				} else {
-					val hake2 = RandomUtils.nextInt(alive_poll_Min.get(), alive_poll_Max.get()).coerceAtMost(alive.size)
-					repeat (hake2) {
-						if (aliveSendMethod.get().equals("pollfirst"))
-							PacketUtils.sendPacketNoEvent(alive.pollFirst())
-						else
-							PacketUtils.sendPacketNoEvent(alive.pollLast())
-					}
+            val sendWhen = when (aliveDelayMode.get().lowercase(Locale.getDefault())) {
+                "playertick" -> mc.thePlayer.ticksExisted > 0 && mc.thePlayer.ticksExisted % alive_pTickDelay.get() == 0
+                "systemtick" -> msTimerAlive.hasTimePassed(aliveDelay.toLong())
+                "dynamic" -> msTimerAlive.hasTimePassed(dynAliveDelay.toLong())
+                else -> alive.size >= aliveBusMinSize.get()
+            }
+            if (!alive.isEmpty() && sendWhen) {
+                if (aliveSendMethod.get().equals("flushall", true)) {
+                    while (alive.size > 0)
+                        PacketUtils.sendPacketNoEvent(alive.poll())
 
-					debug("poll $hake2 times.")
-				}
-				if (clearAliveSent.get()) alive.clear()
-				aliveDelay = RandomUtils.nextInt(alive_sTick_MinDelay.get(), alive_sTick_MaxDelay.get())
-				msTimerAlive.reset()
-			}
-		}
+                    debug("flushed.")
+                } else {
+                    val hake2 = RandomUtils.nextInt(alive_poll_Min.get(), alive_poll_Max.get()).coerceAtMost(alive.size)
+                    repeat(hake2) {
+                        if (aliveSendMethod.get().equals("pollfirst"))
+                            PacketUtils.sendPacketNoEvent(alive.pollFirst())
+                        else
+                            PacketUtils.sendPacketNoEvent(alive.pollLast())
+                    }
+
+                    debug("poll $hake2 times.")
+                }
+                if (clearAliveSent.get()) alive.clear()
+                aliveDelay = RandomUtils.nextInt(alive_sTick_MinDelay.get(), alive_sTick_MaxDelay.get())
+                msTimerAlive.reset()
+            }
+        }
 	}
 }

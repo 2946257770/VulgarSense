@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.util.glu.Cylinder
 import org.lwjgl.util.glu.GLU
 import java.awt.Color
+import java.util.*
 
 @ModuleInfo(name = "Projectiles", description = "Allows you to see where arrows will land.", category = ModuleCategory.RENDER)
 class Projectiles : Module() {
@@ -103,9 +104,11 @@ class Projectiles : Module() {
         // Motions
         var motionX = (-MathHelper.sin(yawRadians) * MathHelper.cos(pitchRadians)
                 * if (isBow) 1.0 else 0.4)
-        var motionY = -MathHelper.sin((pitch +
-                if (item is ItemPotion && ItemPotion.isSplash(mc.thePlayer.heldItem.itemDamage)) -20 else 0)
-                / 180f * 3.1415927f) * if (isBow) 1.0 else 0.4
+        var motionY = -MathHelper.sin(
+            (pitch +
+                    if (item is ItemPotion && ItemPotion.isSplash(mc.thePlayer.heldItem.itemDamage)) -20 else 0)
+                    / 180f * 3.1415927f
+        ) * if (isBow) 1.0 else 0.4
         var motionZ = (MathHelper.cos(yawRadians) * MathHelper.cos(pitchRadians)
                 * if (isBow) 1.0 else 0.4)
         val distance = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ)
@@ -131,13 +134,15 @@ class Projectiles : Module() {
         RenderUtils.disableGlCap(GL11.GL_DEPTH_TEST, GL11.GL_ALPHA_TEST, GL11.GL_TEXTURE_2D)
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
         GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST)
-        when (colorMode.get().toLowerCase()) {
+        when (colorMode.get().lowercase(Locale.getDefault())) {
             "custom" -> {
                 RenderUtils.glColor(Color(colorRedValue.get(), colorGreenValue.get(), colorBlueValue.get(), 255))
             }
+
             "bowpower" -> {
                 RenderUtils.glColor(interpolateHSB(Color.RED, Color.GREEN, (motionFactor / 30) * 10))
             }
+
             "rainbow" -> {
                 RenderUtils.glColor(ColorUtils.rainbow())
             }
@@ -152,8 +157,10 @@ class Projectiles : Module() {
             var posAfter = Vec3(posX + motionX, posY + motionY, posZ + motionZ)
 
             // Get landing position
-            landingPosition = mc.theWorld.rayTraceBlocks(posBefore, posAfter, false,
-                    true, false)
+            landingPosition = mc.theWorld.rayTraceBlocks(
+                posBefore, posAfter, false,
+                true, false
+            )
 
             // Set pos before and after
             posBefore = Vec3(posX, posY, posZ)
@@ -162,12 +169,15 @@ class Projectiles : Module() {
             // Check if arrow is landing
             if (landingPosition != null) {
                 hasLanded = true
-                posAfter = Vec3(landingPosition.hitVec.xCoord, landingPosition.hitVec.yCoord, landingPosition.hitVec.zCoord)
+                posAfter =
+                    Vec3(landingPosition.hitVec.xCoord, landingPosition.hitVec.yCoord, landingPosition.hitVec.zCoord)
             }
 
             // Set arrow box
-            val arrowBox = AxisAlignedBB(posX - size, posY - size, posZ - size, posX + size,
-                    posY + size, posZ + size).addCoord(motionX, motionY, motionZ).expand(1.0, 1.0, 1.0)
+            val arrowBox = AxisAlignedBB(
+                posX - size, posY - size, posZ - size, posX + size,
+                posY + size, posZ + size
+            ).addCoord(motionX, motionY, motionZ).expand(1.0, 1.0, 1.0)
 
             val chunkMinX = MathHelper.floor_double((arrowBox.minX - 2.0) / 16.0)
             val chunkMaxX = MathHelper.floor_double((arrowBox.maxX + 2.0) / 16.0)
@@ -179,16 +189,16 @@ class Projectiles : Module() {
             for (x in chunkMinX..chunkMaxX)
                 for (z in chunkMinZ..chunkMaxZ)
                     mc.theWorld.getChunkFromChunkCoords(x, z)
-                            .getEntitiesWithinAABBForEntity(mc.thePlayer, arrowBox, collidedEntities, null)
+                        .getEntitiesWithinAABBForEntity(mc.thePlayer, arrowBox, collidedEntities, null)
 
             // Check all possible entities
             for (possibleEntity in collidedEntities) {
                 if (possibleEntity.canBeCollidedWith() && possibleEntity !== mc.thePlayer) {
                     val possibleEntityBoundingBox = possibleEntity.entityBoundingBox
-                            .expand(size.toDouble(), size.toDouble(), size.toDouble())
+                        .expand(size.toDouble(), size.toDouble(), size.toDouble())
 
                     val possibleEntityLanding = possibleEntityBoundingBox
-                            .calculateIntercept(posBefore, posAfter) ?: continue
+                        .calculateIntercept(posBefore, posAfter) ?: continue
 
                     hitEntity = true
                     hasLanded = true
@@ -216,15 +226,19 @@ class Projectiles : Module() {
             motionY -= gravity.toDouble()
 
             // Draw path
-            worldRenderer.pos(posX - renderManager.renderPosX, posY - renderManager.renderPosY,
-                    posZ - renderManager.renderPosZ).endVertex()
+            worldRenderer.pos(
+                posX - renderManager.renderPosX, posY - renderManager.renderPosY,
+                posZ - renderManager.renderPosZ
+            ).endVertex()
         }
 
         // End the rendering of the path
         tessellator.draw()
         GL11.glPushMatrix()
-        GL11.glTranslated(posX - renderManager.renderPosX, posY - renderManager.renderPosY,
-                posZ - renderManager.renderPosZ)
+        GL11.glTranslated(
+            posX - renderManager.renderPosX, posY - renderManager.renderPosY,
+            posZ - renderManager.renderPosZ
+        )
 
         if (landingPosition != null) {
             // Switch rotation of hit cylinder of the hit axis

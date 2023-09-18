@@ -10,6 +10,7 @@ import net.ccbluex.liquidbounce.utils.block.BlockUtils
 import net.ccbluex.liquidbounce.utils.misc.StringUtils
 import net.ccbluex.liquidbounce.value.*
 import net.minecraft.block.Block
+import java.util.*
 
 /**
  * Module command
@@ -17,7 +18,7 @@ import net.minecraft.block.Block
  * @author SenkJu
  */
 class ModuleCommand(val module: Module, val values: List<Value<*>> = module.values) :
-    Command(module.name.toLowerCase(), emptyArray()) {
+    Command(module.name.lowercase(Locale.getDefault()), emptyArray()) {
 
     init {
         if (values.isEmpty())
@@ -30,9 +31,9 @@ class ModuleCommand(val module: Module, val values: List<Value<*>> = module.valu
     override fun execute(args: Array<String>) {
         val valueNames = values
             .filter { it !is FontValue }
-            .joinToString(separator = "/") { it.name.toLowerCase() }
+            .joinToString(separator = "/") { it.name.lowercase(Locale.getDefault()) }
 
-        val moduleName = module.name.toLowerCase()
+        val moduleName = module.name.lowercase(Locale.getDefault())
 
         if (args.size < 2) {
             chatSyntax(if (values.size == 1) "$moduleName $valueNames <value>" else "$moduleName <$valueNames>")
@@ -55,9 +56,13 @@ class ModuleCommand(val module: Module, val values: List<Value<*>> = module.valu
         } else {
             if (args.size < 3) {
                 if (value is IntegerValue || value is FloatValue || value is TextValue)
-                    chatSyntax("$moduleName ${args[1].toLowerCase()} <value>")
+                    chatSyntax("$moduleName ${args[1].lowercase(Locale.getDefault())} <value>")
                 else if (value is ListValue)
-                    chatSyntax("$moduleName ${args[1].toLowerCase()} <${value.values.joinToString(separator = "/").toLowerCase()}>")
+                    chatSyntax(
+                        "$moduleName ${args[1].lowercase(Locale.getDefault())} <${
+                            value.values.joinToString(separator = "/").lowercase(Locale.getDefault())
+                        }>"
+                    )
                 return
             }
 
@@ -78,20 +83,31 @@ class ModuleCommand(val module: Module, val values: List<Value<*>> = module.valu
                         }
 
                         value.set(id)
-                        chat("§7${module.name} §8${args[1].toLowerCase()}§7 was set to §8${BlockUtils.getBlockName(id)}§7.")
+                        chat(
+                            "§7${module.name} §8${args[1].lowercase(Locale.getDefault())}§7 was set to §8${
+                                BlockUtils.getBlockName(
+                                    id
+                                )
+                            }§7.")
                         playEdit()
                         return
                     }
+
                     is IntegerValue -> value.set(args[2].toInt())
                     is FloatValue -> value.set(args[2].toFloat())
                     is ListValue -> {
                         if (!value.contains(args[2])) {
-                            chatSyntax("$moduleName ${args[1].toLowerCase()} <${value.values.joinToString(separator = "/").toLowerCase()}>")
+                            chatSyntax(
+                                "$moduleName ${args[1].lowercase(Locale.getDefault())} <${
+                                    value.values.joinToString(separator = "/").lowercase(Locale.getDefault())
+                                }>"
+                            )
                             return
                         }
 
                         value.set(args[2])
                     }
+
                     is TextValue -> value.set(StringUtils.toCompleteString(args, 2))
                 }
 
@@ -109,12 +125,12 @@ class ModuleCommand(val module: Module, val values: List<Value<*>> = module.valu
         return when (args.size) {
             1 -> values
                 .filter { it !is FontValue && it.name.startsWith(args[0], true) }
-                .map { it.name.toLowerCase() }
+                .map { it.name.lowercase(Locale.getDefault()) }
             2 -> {
                 when(module.getValue(args[0])) {
                     is BlockValue -> {
                         return Block.blockRegistry.keys
-                            .map { it.resourcePath.toLowerCase() }
+                            .map { it.resourcePath.lowercase(Locale.getDefault()) }
                             .filter { it.startsWith(args[1], true) }
                     }
                     is ListValue -> {

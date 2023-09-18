@@ -26,6 +26,7 @@ import net.minecraft.network.play.client.C03PacketPlayer.*
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.MovingObjectPosition
+import java.util.*
 
 
 @ModuleInfo(name = "NoSlow", spacedName = "No Slow", category = ModuleCategory.MOVEMENT, description = "Prevent you from getting slowed down by items (swords, foods, etc.) and liquids.")
@@ -220,7 +221,7 @@ class NoSlow : Module() {
         mc.thePlayer.heldItem
         val killAura = LiquidBounce.moduleManager[KillAura::class.java]!!
 
-        when (modeValue.get().toLowerCase()) {
+        when (modeValue.get().lowercase(Locale.getDefault())) {
             "aac5" -> if (event.eventState == EventState.POST && (mc.thePlayer.isUsingItem || mc.thePlayer.isBlocking || killAura.blockingStatus)) {
                 mc.netHandler.addToSendQueue(
                     C08PacketPlayerBlockPlacement(
@@ -250,12 +251,13 @@ class NoSlow : Module() {
                     }
                 }
             }
+
             "hyt" -> {
                 blockForwardMultiplier.set(0.8)
                 blockStrafeMultiplier.set(0.8)
                 consumeForwardMultiplier.set(0.8)
                 consumeStrafeMultiplier.set(0.8)
-                if((event.eventState == EventState.PRE && mc.thePlayer!!.itemInUse != null && mc.thePlayer!!.itemInUse!!.item != null) && !mc.thePlayer!!.isBlocking && mc.thePlayer.isUsingItem || itemType is ItemPotion) {
+                if ((event.eventState == EventState.PRE && mc.thePlayer!!.itemInUse != null && mc.thePlayer!!.itemInUse!!.item != null) && !mc.thePlayer!!.isBlocking && mc.thePlayer.isUsingItem || itemType is ItemPotion) {
                     if (mc.thePlayer!!.isUsingItem && mc.thePlayer!!.itemInUseCount >= 1) {
                         if (mc.thePlayer.isSprinting) {
                             if (!mc.thePlayer!!.onGround) {
@@ -270,9 +272,19 @@ class NoSlow : Module() {
                 }
                 if (event.eventState == EventState.PRE && mc.thePlayer.isBlocking) {
                     mc.timer.timerSpeed = 1.0F
-                    mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, mc.thePlayer.inventory.getCurrentItem(), 0.0f, 0.0f, 0.0f))
+                    mc.netHandler.addToSendQueue(
+                        C08PacketPlayerBlockPlacement(
+                            BlockPos(-1, -1, -1),
+                            255,
+                            mc.thePlayer.inventory.getCurrentItem(),
+                            0.0f,
+                            0.0f,
+                            0.0f
+                        )
+                    )
                 }
             }
+
             "intave" -> {
                 if ((mc.thePlayer.isUsingItem || mc.thePlayer.isBlocking) && timer.hasTimePassed(placeDelay)) {
                     mc.playerController.syncCurrentPlayItem()
@@ -313,31 +325,48 @@ class NoSlow : Module() {
                     }
                 }
             }
+
             "watchdog" -> {
                 if ((mc.thePlayer.isUsingItem || killAura.blockingStatus) && mc.thePlayer.heldItem != null && mc.thePlayer.heldItem.item is ItemSword) {
-                    if(event.eventState == EventState.POST){
-                        mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.inventoryContainer.getSlot(mc.thePlayer.inventory.currentItem + 36).stack))
+                    if (event.eventState == EventState.POST) {
+                        mc.netHandler.addToSendQueue(
+                            C08PacketPlayerBlockPlacement(
+                                mc.thePlayer.inventoryContainer.getSlot(
+                                    mc.thePlayer.inventory.currentItem + 36
+                                ).stack
+                            )
+                        )
                     }
                 }
             }
+
             "switchitem" -> {
                 if (mc.thePlayer.isUsingItem || killAura.blockingStatus) {
                     mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1))
                     mc.netHandler.addToSendQueue(C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem))
                 }
             }
+
             else -> {
                 if (!mc.thePlayer.isBlocking && !killAura.blockingStatus)
                     return
-                when (modeValue.get().toLowerCase()) {
+                when (modeValue.get().lowercase(Locale.getDefault())) {
                     "aac" -> {
                         if (mc.thePlayer.ticksExisted % 3 == 0)
                             sendPacket(event, true, false, false, 0, false)
                         else
                             sendPacket(event, false, true, false, 0, false)
                     }
+
                     "ncp" -> sendPacket(event, true, true, false, 0, false)
-                    "custom" -> sendPacket(event, customRelease.get(), customPlace.get(), customDelayValue.get() > 0, customDelayValue.get().toLong(), customOnGround.get())
+                    "custom" -> sendPacket(
+                        event,
+                        customRelease.get(),
+                        customPlace.get(),
+                        customDelayValue.get() > 0,
+                        customDelayValue.get().toLong(),
+                        customOnGround.get()
+                    )
                 }
             }
         }

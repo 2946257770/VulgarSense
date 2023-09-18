@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.module.modules.world.AutoDisable.DisableEvent
 import net.ccbluex.liquidbounce.utils.ClientUtils
+import java.util.*
 
 class AutoDisableCommand : Command("autodisable", arrayOf("ad")) {
 
@@ -19,14 +20,19 @@ class AutoDisableCommand : Command("autodisable", arrayOf("ad")) {
      */
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
-            when (args[1].toLowerCase()) {
+            when (args[1].lowercase(Locale.getDefault())) {
                 "list" -> {
                     chat("§c§lAutoDisable modules:")
                     LiquidBounce.moduleManager.modules.filter { it.autoDisables.size > 0 }.forEach {
-                        ClientUtils.displayChatMessage("§6> §c${it.name} §7| §a${it.autoDisables.map { d -> d.name.toLowerCase() }.joinToString()}")
+                        ClientUtils.displayChatMessage(
+                            "§6> §c${it.name} §7| §a${
+                                it.autoDisables.map { d -> d.name.lowercase(Locale.getDefault()) }.joinToString()
+                            }"
+                        )
                     }
                     return
                 }
+
                 "clear" -> {
                     LiquidBounce.moduleManager.modules.filter { it.autoDisables.size > 0 }.forEach {
                         it.autoDisables.clear()

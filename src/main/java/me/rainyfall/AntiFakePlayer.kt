@@ -22,6 +22,7 @@ import net.ccbluex.liquidbounce.value.BoolValue
 import net.ccbluex.liquidbounce.value.IntegerValue
 import net.ccbluex.liquidbounce.value.ListValue
 import net.minecraft.network.play.server.S02PacketChat
+import java.util.*
 import java.util.regex.Pattern
 
 /*
@@ -92,25 +93,27 @@ class AntiFakePlayer : Module() {
 
     // 职业战争自定义延迟
     private val kitCustomDelayValue =
-        IntegerValue("KitCustomDelay", 4700, 4000, 8000) { modeValue.get().toLowerCase() == "kitbattle" }
+        IntegerValue("KitCustomDelay", 4700, 4000, 8000) {
+            modeValue.get().lowercase(Locale.getDefault()) == "kitbattle"
+        }
 
     // 职业战争隐藏银币消息
     private val kitHideKillCoinValue =
-        BoolValue("HideKitBattleCoinChat", true) { modeValue.get().toLowerCase() == "kitbattle" }
+        BoolValue("HideKitBattleCoinChat", true) { modeValue.get().lowercase(Locale.getDefault()) == "kitbattle" }
 
     // 职业战争隐藏连死消息
     private val kitHideDeathStreakValue =
-        BoolValue("HideKitDeathStreakChat", false) { modeValue.get().toLowerCase() == "kitbattle" }
+        BoolValue("HideKitDeathStreakChat", false) { modeValue.get().lowercase(Locale.getDefault()) == "kitbattle" }
 
     // 职业奇死
     private val kitHideSpecialDeathValue =
-        BoolValue("HideKitSpecialDeathChat", false) { modeValue.get().toLowerCase() == "kitbattle" }
+        BoolValue("HideKitSpecialDeathChat", false) { modeValue.get().lowercase(Locale.getDefault()) == "kitbattle" }
 
     // 职业技能
     private val kitHideSkillChatValue =
-        BoolValue("HideKitSkillChat", false) { modeValue.get().toLowerCase() == "kitbattle" }
+        BoolValue("HideKitSkillChat", false) { modeValue.get().lowercase(Locale.getDefault()) == "kitbattle" }
     private val kitHidePlayerUpgradeChatValue =
-        BoolValue("HideKitUpgradeChat", false) { modeValue.get().toLowerCase() == "kitbattle" }
+        BoolValue("HideKitUpgradeChat", false) { modeValue.get().lowercase(Locale.getDefault()) == "kitbattle" }
 
     // 隐藏连杀消息, 支持职业战争
     private val hideMultiKillChatValue = BoolValue("HideMultiKillChat", true)
@@ -217,7 +220,7 @@ class AntiFakePlayer : Module() {
             ))
         ) {
             val chat = packet.chatComponent.unformattedText
-            when (modeValue.get().toLowerCase()) {
+            when (modeValue.get().lowercase(Locale.getDefault())) {
                 // 4v4 2v2 1v1 起床
                 "4v4/2v2/1v1" -> {
                     val matcher = Pattern.compile("杀死了 (.*?)\\(").matcher(chat)
@@ -338,7 +341,7 @@ class AntiFakePlayer : Module() {
         // 职业战争相关
         if (packet is S02PacketChat) {
             val chat = packet.chatComponent.unformattedText
-            if (modeValue.get().toLowerCase() == "kitbattle" && chat.startsWith("花雨庭")) {
+            if (modeValue.get().lowercase(Locale.getDefault()) == "kitbattle" && chat.startsWith("花雨庭")) {
                 // 职业隐藏银币消息
                 if (kitHideKillCoinValue.get() && ((chat.startsWith("花雨庭 >>你消灭") && chat.contains("% 的伤害并且获得了") && chat.endsWith(
                         "硬币!"
@@ -389,19 +392,19 @@ class AntiFakePlayer : Module() {
         // 自动切换模式 不清楚是否有效
         if (packet is S02PacketChat && autoModeValue.get()) {
             val chat = packet.chatComponent.unformattedText
-            if (chat.startsWith("花雨庭 >>") && modeValue.get().toLowerCase() != "kitbattle") {
+            if (chat.startsWith("花雨庭 >>") && modeValue.get().lowercase(Locale.getDefault()) != "kitbattle") {
                 modeValue.set("KitBattle")
                 displayChatMessage("§7[§dAntiFP§7] §f自动切换模式为§c职业战争§7。")
             }
-            if (chat.startsWith("起床战争>>") && modeValue.get().toLowerCase() != "4v4/2v2/1v1") {
+            if (chat.startsWith("起床战争>>") && modeValue.get().lowercase(Locale.getDefault()) != "4v4/2v2/1v1") {
                 modeValue.set("4v4/2v2/1v1")
                 displayChatMessage("§7[§dAntiFP§7] §f自动切换模式为§c4v4/2v2/1v1§7。")
             }
-            if (chat.startsWith("起床战争 >>") && modeValue.get().toLowerCase() != "bwxp32") {
+            if (chat.startsWith("起床战争 >>") && modeValue.get().lowercase(Locale.getDefault()) != "bwxp32") {
                 modeValue.set("BWXP32")
                 displayChatMessage("§7[§dAntiFP§7] §f自动切换模式为§c经验32§7。")
             }
-            if (chat.startsWith("[起床战争]") && modeValue.get().toLowerCase() != "bwxp16") {
+            if (chat.startsWith("[起床战争]") && modeValue.get().lowercase(Locale.getDefault()) != "bwxp16") {
                 modeValue.set("BWXP16")
                 displayChatMessage("§7[§dAntiFP§7] §f自动切换模式为§c经验16§7。")
             }
@@ -413,7 +416,7 @@ class AntiFakePlayer : Module() {
     fun onUpdate(event: UpdateEvent) {
         if (bots < 0) bots = 0
         if (autoSwitchLogger.get() && ms.hasTimePassed(autoSwitchDelay.get().toLong())) {
-            when (autoSwitchModeValue.get().toLowerCase()) {
+            when (autoSwitchModeValue.get().lowercase(Locale.getDefault())) {
                 "random" -> logStyleValue.set(logStyles[RandomUtils.nextInt(0, logStyles.size - 1)])
                 "list" -> {
                     if (logNumber != logStyles.size - 1) {
@@ -469,9 +472,9 @@ class AntiFakePlayer : Module() {
 
     // 日志
     private fun printLogger(name: String, mode: String) {
-        when (mode.toLowerCase()) {
+        when (mode.lowercase(Locale.getDefault())) {
             "add" -> {
-                when (logStyleValue.get().toLowerCase()) {
+                when (logStyleValue.get().lowercase(Locale.getDefault())) {
                     "ryfnew" -> displayChatMessage("§b${CLIENT_NAME} §7» §aAdded§f HYT Bot §7-> §e$name")
                     "fdpantibot" -> displayChatMessage("§7[§cAntiBot§7] §fAdded §7$name§f due to it being a bot.")
                     "fdpchat" -> displayChatMessage("§f[§c!§f] §b${CLIENT_NAME} §7>> §aAdded §6HYT bot§f[$name§f]§6.")
@@ -488,7 +491,7 @@ class AntiFakePlayer : Module() {
             }
 
             "remove" -> {
-                when (logStyleValue.get().toLowerCase()) {
+                when (logStyleValue.get().lowercase(Locale.getDefault())) {
                     "ryfnew" -> displayChatMessage("§b${CLIENT_NAME} §7» §cRemoved§f HYT Bot §7-> §e$name")
                     "fdpantibot" -> displayChatMessage("§7[§cAntiBot§7] §fRemoved §7$name§f due to respawn.")
                     "fdpchat" -> displayChatMessage("§f[§c!§f] §b${CLIENT_NAME} §7>> §cRemoved §6HYT bot§f[$name§f]§6.")
@@ -525,7 +528,7 @@ class AntiFakePlayer : Module() {
             if (!sTHideBotsCounter.get()) {
                 if (tag != "") tag = "$tag, Bots: $bots" else "Bots: $bots"
             } else {
-                if (sTHideBotsCounterSetting.get().toLowerCase() == "onlynumber") if (tag != "") tag =
+                if (sTHideBotsCounterSetting.get().lowercase(Locale.getDefault()) == "onlynumber") if (tag != "") tag =
                     "$tag, $bots" else bots
             }
 
@@ -533,7 +536,7 @@ class AntiFakePlayer : Module() {
                 if (tag != "" && !sTHideAutoSwitcherState.get()) tag =
                     "$tag, AutoSwitch:${if (autoSwitchLogger.get()) "On" else "Off"}"
                 if (sTHideAutoSwitcherState.get() && sTHideAutoSwitcherStateSetting.get()
-                        .toLowerCase() == "onlyshowstate"
+                        .lowercase(Locale.getDefault()) == "onlyshowstate"
                 ) {
                     tag =
                         if (tag != "") "$tag, ${if (autoSwitchLogger.get()) "On" else "Off"}" else if (autoSwitchLogger.get()) "On" else "Off"

@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.features.special.MacroManager
 import net.ccbluex.liquidbounce.utils.ClientUtils
 import net.ccbluex.liquidbounce.utils.misc.StringUtils
 import org.lwjgl.input.Keyboard
+import java.util.*
 
 class MacroCommand : Command("macro", emptyArray()) {
     /**
@@ -24,7 +25,7 @@ class MacroCommand : Command("macro", emptyArray()) {
                 chatSyntax("macro <list/clear/add/remove>")
                 return
             }
-            when (args[1].toLowerCase()) {
+            when (args[1].lowercase(Locale.getDefault())) {
                 "add" -> {
                     if (args.size < 4) {
                         chatSyntax("macro add <key name> <message>")
@@ -41,6 +42,7 @@ class MacroCommand : Command("macro", emptyArray()) {
                     playEdit()
                     return
                 }
+
                 "remove" -> {
                     if (MacroManager.macroMapping.containsKey(key)) {
                         val lastMessage = MacroManager.macroMapping[key]
@@ -57,7 +59,7 @@ class MacroCommand : Command("macro", emptyArray()) {
             }
         }
         if (args.size == 2) {
-            when (args[1].toLowerCase()) {
+            when (args[1].lowercase(Locale.getDefault())) {
                 "list" -> {
                     chat("§6§lMacros:")
                     MacroManager.macroMapping.forEach {
@@ -65,6 +67,7 @@ class MacroCommand : Command("macro", emptyArray()) {
                     }
                     return
                 }
+
                 "clear" -> {
                     MacroManager.macroMapping.clear()
                     playEdit()
@@ -72,10 +75,12 @@ class MacroCommand : Command("macro", emptyArray()) {
                     chat("§a§lSuccessfully cleared macro list.")
                     return
                 }
+
                 "add" -> {
                     chatSyntax("macro add <key name> <message>")
                     return
                 }
+
                 "remove" -> {
                     chatSyntax("macro remove <key name>")
                     return

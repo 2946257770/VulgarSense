@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.utils.MovementUtils
 import net.ccbluex.liquidbounce.value.BoolValue
 import net.ccbluex.liquidbounce.value.FloatValue
 import net.ccbluex.liquidbounce.value.ListValue
+import java.util.*
 import kotlin.jvm.internal.Intrinsics
 
 @ModuleInfo(name = "GroundTelly", description = "GroundTelly", category = ModuleCategory.WORLD)
@@ -77,7 +78,7 @@ class GroundTelly : Module() {
     }
 
     private fun jump() {
-        when (autoJumpMode.get().toLowerCase()) {
+        when (autoJumpMode.get().lowercase(Locale.getDefault())) {
             "mcinstancejump" -> mc.thePlayer!!.jump()
             "mcinstance2jump" -> mc.thePlayer!!.jump()
             "clientmotiony" -> mc.thePlayer!!.motionY = 0.42
@@ -96,14 +97,14 @@ class GroundTelly : Module() {
     }
 
     private fun scaffoldChange(state: Boolean) {
-        when (scaffoldModule.get().toLowerCase()) {
+        when (scaffoldModule.get().lowercase(Locale.getDefault())) {
             "scaffold" -> moduleManager.getModule(Scaffold::class.java)!!.state = state
         }
     }
 
     private fun tryJump() {
         val thePlayer = mc.thePlayer!!
-        when (autoJumpHelper.get().toLowerCase()) {
+        when (autoJumpHelper.get().lowercase(Locale.getDefault())) {
             "parkour" -> if (MovementUtils.isMoving() && thePlayer.onGround && !thePlayer.isSneaking && !mc.gameSettings.keyBindSneak.isKeyDown && !mc.gameSettings.keyBindJump.isKeyDown &&
                 mc.theWorld!!.getCollidingBoundingBoxes(
                     thePlayer, thePlayer.entityBoundingBox
@@ -128,7 +129,7 @@ class GroundTelly : Module() {
 
     private fun setYaw() {
         val thePlayer = mc.thePlayer!!
-        if (autoYawValue.get().toLowerCase().equals("none")) return
+        if (autoYawValue.get().lowercase(Locale.getDefault()).equals("none")) return
         val x = java.lang.Double.valueOf(thePlayer.motionX)
         val y = java.lang.Double.valueOf(thePlayer.motionZ)
         if (mc.gameSettings.keyBindForward.isKeyDown) {

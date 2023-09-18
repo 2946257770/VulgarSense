@@ -974,7 +974,7 @@ class Disabler : Module() {
 
 	@EventTarget
 	fun onUpdate(event: UpdateEvent) {
-		when (modeValue.get().toLowerCase()) {
+		when (modeValue.get().lowercase(Locale.getDefault())) {
 			"spartancombat" -> {
 				if (msTimer.hasTimePassed(3000L) && keepAlives.size > 0 && transactions.size > 0) {
 					PacketUtils.sendPacketNoEvent(keepAlives[keepAlives.size - 1])
@@ -987,6 +987,7 @@ class Disabler : Module() {
 					msTimer.reset()
 				}
 			}
+
 			"oldverus" -> {
 				if (mc.thePlayer.ticksExisted % 180 == 0) {
 					while (packetQueue.size > 22) {
@@ -995,22 +996,37 @@ class Disabler : Module() {
 					debug("pushed queue until size < 22.")
 				}
 			}
+
 			"latestverus" -> {
 				if (verusAntiFlyCheck.get() && !shouldActive) {
 					val flyMod = LiquidBounce.moduleManager[Fly::class.java]!!
 					if (flyMod.state) {
 						flyMod.state = false
-						LiquidBounce.hud.addNotification(Notification("Disabler","You can't fly before successful activation.", NotifyType.ERROR))
+						LiquidBounce.hud.addNotification(
+							Notification(
+								"Disabler",
+								"You can't fly before successful activation.",
+								NotifyType.ERROR
+							)
+						)
 						debug("no fly allowed")
 					}
 				}
 				if (mc.thePlayer.ticksExisted % 15 == 0 && shouldRun()) {
 					if (verusFakeInput.get()) {
-						mc.netHandler.addToSendQueue(C0CPacketInput(mc.thePlayer.moveStrafing.coerceAtMost(0.98F), mc.thePlayer.moveForward.coerceAtMost(0.98F), mc.thePlayer.movementInput.jump, mc.thePlayer.movementInput.sneak))
+						mc.netHandler.addToSendQueue(
+							C0CPacketInput(
+								mc.thePlayer.moveStrafing.coerceAtMost(0.98F),
+								mc.thePlayer.moveForward.coerceAtMost(0.98F),
+								mc.thePlayer.movementInput.jump,
+								mc.thePlayer.movementInput.sneak
+							)
+						)
 						debug("c0c")
 					}
 				}
 			}
+
 			"pingspoof" -> {
 				if (msTimer.hasTimePassed(psfWorldDelay.get().toLong()) && !shouldActive) {
 					shouldActive = true
@@ -1029,9 +1045,21 @@ class Disabler : Module() {
 					}
 				}
 			}
+
 			"flag" -> {
-				if (flagMode.get().equals("packet", true) && mc.thePlayer.ticksExisted > 0 && mc.thePlayer.ticksExisted % flagTick.get() == 0) {
-					PacketUtils.sendPacketNoEvent(C04PacketPlayerPosition(mc.thePlayer.posX, -0.08, mc.thePlayer.posZ, mc.thePlayer.onGround))
+				if (flagMode.get().equals(
+						"packet",
+						true
+					) && mc.thePlayer.ticksExisted > 0 && mc.thePlayer.ticksExisted % flagTick.get() == 0
+				) {
+					PacketUtils.sendPacketNoEvent(
+						C04PacketPlayerPosition(
+							mc.thePlayer.posX,
+							-0.08,
+							mc.thePlayer.posZ,
+							mc.thePlayer.onGround
+						)
+					)
 					debug("flagged")
 				}
 			}

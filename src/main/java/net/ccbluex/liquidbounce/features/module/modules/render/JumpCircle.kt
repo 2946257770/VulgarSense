@@ -21,6 +21,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -51,17 +52,18 @@ class JumpCircle : Module() {
 
     @EventTarget
     fun onRender3D(event: Render3DEvent?) {
-        when (typeValue.get().toLowerCase()) {
+        when (typeValue.get().lowercase(Locale.getDefault())) {
             "oldcircle" -> {
-        points.forEach {
-            for (point in it.value) {
-                point.draw()
-                if (point.alpha < 0F) {
-                    it.value.remove(point)
+                points.forEach {
+                    for (point in it.value) {
+                        point.draw()
+                        if (point.alpha < 0F) {
+                            it.value.remove(point)
+                        }
+                    }
                 }
             }
-        }
-    }
+
             "newcircle" -> {
                 circles.removeIf { System.currentTimeMillis() > it.time + disappearTime.get() }
 
@@ -112,7 +114,7 @@ class JumpCircle : Module() {
     }
 
     fun updatePoints(entity: EntityLivingBase) {
-        when (typeValue.get().toLowerCase()) {
+        when (typeValue.get().lowercase(Locale.getDefault())) {
             "oldcircle" -> {
                 val counter = intArrayOf(0)
                 (points[entity.entityId] ?: mutableListOf<Render>().also { points[entity.entityId] = it }).add(
@@ -123,6 +125,7 @@ class JumpCircle : Module() {
                 )
                 counter[0] = counter[0] + 1
             }
+
             "newcircle" -> {
                 circles.add(Circle(System.currentTimeMillis(), mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ))
             }
